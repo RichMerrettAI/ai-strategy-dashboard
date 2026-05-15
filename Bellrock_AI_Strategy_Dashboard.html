@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bellrock AI Strategy Dashboard</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;0,9..40,800;1,9..40,400&display=swap');
+
+:root {
+  --pine: #0d5c5c;
+  --pine-light: #0e6b6b;
+  --lichen: #7fb39a;
+  --fir: #1a3a3a;
+  --sand: #f0ebe3;
+  --cream: #faf7f2;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'DM Sans', 'Segoe UI', system-ui, sans-serif;
+  background: var(--cream);
+  color: #334155;
+  min-height: 100vh;
+}
+
+/* Header */
+.header {
+  background: linear-gradient(135deg, var(--fir) 0%, var(--pine) 50%, var(--pine-light) 100%);
+  padding: 24px 28px 20px;
+}
+.header-inner { max-width: 1200px; margin: 0 auto; }
+.header-top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; }
+.header-brand-label { font-size: 10px; color: var(--lichen); font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 4px; }
+.header-title { color: #fff; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+.header-subtitle { color: rgba(255,255,255,0.55); font-size: 12px; margin-top: 4px; }
+
+.nav-tabs { display: flex; gap: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; padding: 3px; }
+.nav-tab {
+  padding: 8px 20px; border: none; border-radius: 8px; font-size: 12px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; background: transparent; color: rgba(255,255,255,0.65);
+  font-family: inherit;
+}
+.nav-tab.active { background: #fff; color: var(--pine); box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+.nav-tab:hover:not(.active) { color: #fff; }
+
+.stats-bar { display: flex; gap: 20px; margin-top: 18px; flex-wrap: wrap; }
+.stat-item .stat-val { font-size: 26px; font-weight: 800; }
+.stat-item .stat-label { font-size: 10px; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* Filters */
+.filters-bar {
+  background: #fff; border-bottom: 1px solid #e2e8f0; padding: 12px 28px;
+}
+.filters-inner { max-width: 1200px; margin: 0 auto; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.filter-input, .filter-select {
+  padding: 7px 12px; border-radius: 7px; border: 1px solid #e2e8f0; font-size: 12px;
+  color: #334155; background: #fff; cursor: pointer; outline: none; font-family: inherit;
+  transition: border-color 0.2s;
+}
+.filter-input:focus, .filter-select:focus { border-color: var(--pine); }
+.filter-input { flex: 1; min-width: 160px; }
+.filter-count { font-size: 11px; color: #94a3b8; font-weight: 600; }
+
+/* Content */
+.content { max-width: 1200px; margin: 0 auto; padding: 24px 28px 48px; }
+
+/* Governance Banner */
+.governance-banner {
+  background: linear-gradient(135deg, var(--fir), var(--pine));
+  border-radius: 16px; padding: 22px 26px; color: #fff; margin-bottom: 18px;
+}
+.governance-header { display: flex; align-items: center; gap: 14px; }
+.governance-icon { font-size: 30px; }
+.governance-title { font-size: 18px; font-weight: 700; }
+.governance-subtitle { font-size: 12px; opacity: 0.8; margin-top: 4px; }
+.governance-items { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+.governance-item {
+  background: rgba(255,255,255,0.1); border-radius: 8px; padding: 10px 16px;
+  font-size: 11px; flex: 1 1 220px; line-height: 1.4;
+}
+
+/* Two Column */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px; }
+.strategy-card { background: #fff; border-radius: 14px; border: 1px solid #e2e8f0; overflow: hidden; }
+.strategy-card-header { padding: 18px 22px; color: #fff; }
+.strategy-card-header h3 { margin: 4px 0 0; font-size: 16px; font-weight: 700; }
+.strategy-card-header p { margin: 4px 0 0; font-size: 11px; opacity: 0.8; }
+.strategy-card-body { padding: 18px; }
+.people-item { padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
+.people-item:last-child { border-bottom: none; }
+.people-item h5 { font-size: 13px; font-weight: 700; color: var(--fir); margin: 0; }
+.people-item p { margin: 3px 0 0; font-size: 11px; color: #64748b; line-height: 1.4; }
+
+.pillar-stats { display: flex; gap: 8px; margin-bottom: 16px; }
+.pillar-stat {
+  flex: 1; border-radius: 8px; padding: 12px; color: #fff; text-align: center; cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.pillar-stat:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+.pillar-stat .ps-val { font-size: 24px; font-weight: 800; }
+.pillar-stat .ps-label { font-size: 10px; opacity: 0.9; }
+
+.step-row { display: flex; align-items: center; gap: 10px; padding: 6px 0; }
+.step-num {
+  width: 24px; height: 24px; border-radius: 50%; background: var(--pine); color: #fff;
+  font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.step-text { font-size: 12px; color: #334155; }
+
+/* Pillar Grid */
+.pillar-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.pillar-card { background: #fff; border-radius: 14px; border: 1px solid #e2e8f0; overflow: hidden; }
+.pillar-card-header { padding: 16px 20px; color: #fff; }
+.pillar-card-header .pillar-icon { font-size: 22px; margin-bottom: 4px; }
+.pillar-card-header h3 { margin: 0; font-size: 16px; font-weight: 700; }
+.pillar-card-header .pillar-desc { margin: 4px 0 0; font-size: 11px; opacity: 0.85; line-height: 1.4; }
+.pillar-card-stats { display: flex; gap: 12px; margin-top: 10px; }
+.pillar-card-stats .pcs-val { font-size: 20px; font-weight: 800; }
+.pillar-card-stats .pcs-detail { font-size: 10px; line-height: 1.3; opacity: 0.8; }
+.pillar-card-body { padding: 12px; display: flex; flex-direction: column; gap: 8px; max-height: 420px; overflow-y: auto; }
+.pillar-more { text-align: center; font-size: 11px; color: #94a3b8; padding: 8px; }
+
+/* Use Case Card */
+.uc-card {
+  background: #fff; border-radius: 10px; padding: 14px 16px; cursor: pointer;
+  border: 1px solid #e2e8f0; transition: all 0.2s; position: relative;
+}
+.uc-card:hover { border-color: var(--pine); box-shadow: 0 4px 12px rgba(13,92,92,0.1); }
+.uc-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
+.uc-card-title { font-size: 13px; font-weight: 700; color: var(--fir); line-height: 1.3; flex: 1; }
+.uc-badge {
+  font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 99px; color: #fff;
+  white-space: nowrap; flex-shrink: 0;
+}
+.uc-card-problem {
+  font-size: 11px; color: #64748b; margin: 0 0 10px; line-height: 1.4;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.uc-card-bottom { display: flex; justify-content: space-between; align-items: center; }
+.uc-card-scores { display: flex; gap: 12px; }
+.score-bar-wrap { display: flex; align-items: center; gap: 6px; }
+.score-bar-bg { width: 60px; height: 6px; border-radius: 3px; background: #e2e8f0; }
+.score-bar-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+.score-bar-val { font-size: 11px; color: #64748b; font-weight: 600; min-width: 16px; }
+.uc-card-score { font-size: 18px; font-weight: 800; color: var(--pine); }
+.uc-card-tags { display: flex; gap: 4px; margin-top: 8px; flex-wrap: wrap; align-items: center; }
+.uc-tag { font-size: 9px; padding: 1px 6px; border-radius: 4px; background: #f1f5f9; color: #475569; }
+.ft-pill { font-size: 9px; padding: 1px 7px; border-radius: 99px; color: #fff; font-weight: 700; letter-spacing: 0.2px; }
+.ft-cs { background: #3b82f6; }   /* Cost Saving - blue */
+.ft-ca { background: #d97706; }   /* Cost Avoidance - amber */
+.ft-rg { background: #10b981; }   /* Revenue Generating - green */
+
+/* Detail tab styling (Current Progress / Proposed Projects) */
+.detail-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.detail-card { background: #fff; border-radius: 14px; border: 1px solid #e2e8f0; overflow: hidden; }
+.detail-card-header { padding: 16px 20px; color: #fff; }
+.detail-card-header .dch-eyebrow { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.8; font-weight: 700; }
+.detail-card-header h3 { margin: 4px 0 0; font-size: 17px; font-weight: 800; }
+.detail-card-header .dch-sub { font-size: 11px; opacity: 0.85; margin-top: 4px; }
+.detail-card-body { padding: 16px 18px; }
+.detail-row { padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
+.detail-row:last-child { border-bottom: none; }
+.detail-row .dr-label { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; font-weight: 700; }
+.detail-row .dr-value { font-size: 12px; color: #334155; margin-top: 3px; line-height: 1.45; }
+.status-pill { display: inline-block; font-size: 10px; padding: 2px 9px; border-radius: 99px; color: #fff; font-weight: 700; letter-spacing: 0.3px; }
+.cp-section-title { font-size: 14px; font-weight: 800; color: var(--fir); margin: 6px 0 14px; letter-spacing: -0.2px; }
+.cp-section-sub { font-size: 12px; color: #64748b; margin-bottom: 18px; line-height: 1.5; }
+.ask-box { background: linear-gradient(135deg, var(--fir), var(--pine)); color: #fff; border-radius: 10px; padding: 10px 14px; margin-top: 12px; font-size: 11px; line-height: 1.4; }
+.ask-box .ask-label { font-size: 9px; text-transform: uppercase; letter-spacing: 1.2px; opacity: 0.75; font-weight: 700; margin-bottom: 4px; }
+
+/* AI Workforce Tools Calculator */
+.calc-section { margin-top: 22px; background: #fff; border-radius: 14px; border: 1px solid #e2e8f0; overflow: hidden; }
+.calc-header { background: linear-gradient(135deg, #2d7d7d, #4a9090); padding: 20px 24px; color: #fff; }
+.calc-header-top { display: flex; align-items: center; gap: 14px; }
+.calc-header h3 { margin: 0; font-size: 18px; font-weight: 700; }
+.calc-header p { margin: 6px 0 0; font-size: 12px; opacity: 0.85; line-height: 1.4; max-width: 700px; }
+.calc-body { padding: 24px; }
+.calc-tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin-bottom: 24px; }
+.calc-tool-card { border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; transition: all 0.2s; }
+.calc-tool-card:hover { border-color: var(--pine); box-shadow: 0 2px 8px rgba(13,92,92,0.08); }
+.calc-tool-card.active { border-color: var(--pine); background: #f0fafa; }
+.calc-tool-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+.calc-tool-name { font-size: 14px; font-weight: 700; color: var(--fir); }
+.calc-tool-tag { font-size: 9px; padding: 2px 8px; border-radius: 99px; font-weight: 600; }
+.calc-tool-desc { font-size: 11px; color: #64748b; line-height: 1.4; margin-bottom: 12px; }
+.calc-tool-price { font-size: 12px; color: var(--pine); font-weight: 700; margin-bottom: 10px; }
+.calc-tool-input { display: flex; align-items: center; gap: 8px; }
+.calc-tool-input label { font-size: 11px; color: #64748b; white-space: nowrap; }
+.calc-tool-input input {
+  width: 80px; padding: 6px 10px; border: 1px solid #e2e8f0; border-radius: 6px;
+  font-size: 13px; font-weight: 600; color: var(--fir); text-align: center; font-family: inherit;
+  outline: none; transition: border-color 0.2s;
+}
+.calc-tool-input input:focus { border-color: var(--pine); }
+.calc-tool-subtotal { font-size: 13px; font-weight: 700; color: var(--pine); margin-top: 10px; }
+.calc-summary { background: linear-gradient(135deg, var(--fir), var(--pine)); border-radius: 12px; padding: 20px 24px; color: #fff; }
+.calc-summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; }
+.calc-summary-item .csi-val { font-size: 28px; font-weight: 800; }
+.calc-summary-item .csi-label { font-size: 10px; opacity: 0.6; text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* Pipeline Grid */
+.pipeline-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.pipeline-empty { text-align: center; padding: 60px; color: #94a3b8; }
+.pipeline-empty-icon { font-size: 40px; }
+
+/* Matrix */
+.matrix-wrap { background: #fff; border-radius: 14px; border: 1px solid #e2e8f0; padding: 26px; }
+.matrix-title { font-size: 16px; font-weight: 700; color: var(--fir); margin: 0 0 4px; }
+.matrix-subtitle { font-size: 12px; color: #94a3b8; margin: 0 0 22px; }
+.matrix-plot { position: relative; width: 100%; height: 500px; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; background: #fafbfc; }
+.matrix-quadrant-label { position: absolute; font-size: 12px; font-weight: 700; text-transform: uppercase; pointer-events: none; }
+.matrix-axis { position: absolute; }
+.matrix-axis-h { left: 0; right: 0; top: 50%; border-top: 1px dashed #e2e8f0; }
+.matrix-axis-v { top: 0; bottom: 0; left: 50%; border-left: 1px dashed #e2e8f0; }
+.matrix-axis-label { position: absolute; font-size: 10px; color: #94a3b8; font-weight: 600; }
+.matrix-dot {
+  position: absolute; border-radius: 50%; border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2); cursor: pointer;
+  transform: translate(-50%, -50%); transition: all 0.2s; z-index: 1;
+}
+.matrix-dot:hover { transform: translate(-50%, -50%) scale(1.5); z-index: 10; }
+.matrix-legend { display: flex; gap: 16px; justify-content: center; margin-top: 16px; }
+.matrix-legend-item { display: flex; align-items: center; gap: 6px; }
+.matrix-legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+.matrix-legend-text { font-size: 11px; color: #64748b; }
+
+/* Modal */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000;
+  display: none; align-items: center; justify-content: center; padding: 20px;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: #fff; border-radius: 16px; max-width: 620px; width: 100%;
+  max-height: 85vh; overflow: auto;
+}
+.modal-header { padding: 24px 28px; border-radius: 16px 16px 0 0; }
+.modal-header-top { display: flex; justify-content: space-between; align-items: flex-start; }
+.modal-category { font-size: 11px; color: var(--lichen); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+.modal-title { color: #fff; margin: 6px 0 0; font-size: 20px; font-weight: 700; }
+.modal-close {
+  background: rgba(255,255,255,0.15); border: none; color: #fff; width: 32px; height: 32px;
+  border-radius: 8px; cursor: pointer; font-size: 16px; font-family: inherit;
+}
+.modal-badges { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.modal-badge { font-size: 11px; padding: 3px 10px; border-radius: 99px; color: #fff; font-weight: 600; }
+.modal-body { padding: 22px 28px; }
+.modal-section { margin-bottom: 20px; }
+.modal-section-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin: 0 0 6px; font-weight: 600; }
+.modal-section-text { font-size: 14px; color: #334155; line-height: 1.5; }
+.modal-kpi { font-size: 14px; color: var(--pine); line-height: 1.5; font-weight: 600; }
+.modal-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+.modal-info-box { background: #f8fafc; padding: 12px; border-radius: 8px; }
+.modal-info-box .mib-label { font-size: 10px; color: #94a3b8; text-transform: uppercase; }
+.modal-info-box .mib-val { font-size: 12px; color: #334155; margin-top: 4px; font-weight: 500; }
+.modal-scores { display: flex; gap: 8px; flex-wrap: wrap; }
+.modal-score-box { background: #f8fafc; border-radius: 8px; padding: 8px 14px; text-align: center; min-width: 70px; }
+.modal-score-box .msb-val { font-size: 20px; font-weight: 800; }
+.modal-score-box .msb-label { font-size: 9px; color: #94a3b8; text-transform: uppercase; }
+.modal-score-total { background: var(--pine); }
+.modal-score-total .msb-val { color: #fff; }
+.modal-score-total .msb-label { color: var(--lichen); }
+
+/* Hidden views */
+.view-section { display: none; }
+.view-section.active { display: block; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+@media (max-width: 900px) {
+  .two-col { grid-template-columns: 1fr; }
+  .pillar-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 600px) {
+  .pillar-grid { grid-template-columns: 1fr; }
+  .header-top { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div class="header-top">
+      <div>
+        <div class="header-brand-label">Bellrock</div>
+        <h1 class="header-title">AI Strategy Dashboard</h1>
+        <p class="header-subtitle" id="headerSubtitle"></p>
+      </div>
+      <div class="nav-tabs">
+        <button class="nav-tab active" data-view="strategy">Strategy View</button>
+        <button class="nav-tab" data-view="pipeline">Pipeline</button>
+        <button class="nav-tab" data-view="matrix">Impact Matrix</button>
+        <button class="nav-tab" data-view="progress">Current Progress</button>
+        <button class="nav-tab" data-view="proposed">Proposed Projects</button>
+      </div>
+    </div>
+    <div class="stats-bar" id="statsBar"></div>
+  </div>
+</div>
+
+<!-- FILTERS -->
+<div class="filters-bar">
+  <div class="filters-inner">
+    <input class="filter-input" type="text" id="searchInput" placeholder="Search ideas...">
+    <select class="filter-select" id="filterArea"><option value="All">All Areas</option></select>
+    <select class="filter-select" id="filterProgress"><option value="All">All Stages</option></select>
+    <select class="filter-select" id="filterPillar"><option value="All">All Pillars</option></select>
+    <select class="filter-select" id="filterFinancial">
+      <option value="All">All Financial</option>
+      <option value="Cost Saving">Cost Saving</option>
+      <option value="Cost Avoidance">Cost Avoidance</option>
+      <option value="Revenue Generating">Revenue Generating</option>
+    </select>
+    <span class="filter-count" id="filterCount"></span>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <!-- STRATEGY VIEW -->
+  <div class="view-section active" id="viewStrategy">
+    <!-- Governance -->
+    <div class="governance-banner">
+      <div class="governance-header">
+        <span class="governance-icon">&#127963;&#65039;</span>
+        <div>
+          <div class="governance-title">AI Governance Framework</div>
+          <div class="governance-subtitle">Updated AI Policy &middot; AI Governance Committee &middot; AI Risk Assessment &middot; AI Ideas Chatbot in Teams</div>
+        </div>
+      </div>
+      <div class="governance-items">
+        <div class="governance-item">AI Policy enables innovation without infosec blocks</div>
+        <div class="governance-item">Committee: Head of AI, Legal, DPO, Head of Data, Director of AI</div>
+        <div class="governance-item">Streamlined Risk Assessment triggering DPIA where needed</div>
+        <div class="governance-item">Anyone can submit ideas via the Teams chatbot</div>
+      </div>
+    </div>
+
+    <!-- Two column -->
+    <div class="two-col">
+      <!-- People Strategy -->
+      <div class="strategy-card">
+        <div class="strategy-card-header" style="background:#2d7d7d">
+          <span style="font-size:22px">&#128101;</span>
+          <h3>People Strategy</h3>
+          <p>Raising the AI waterline across the whole business</p>
+        </div>
+        <div class="strategy-card-body">
+          <div class="people-item"><h5>Company Training</h5><p>30-min webinars every 6 months. Practical, accessible, mandatory for all.</p></div>
+          <div class="people-item"><h5>SLT Workshops</h5><p>Bespoke sessions with Senior Leadership. How to empower teams and champion AI from the top.</p></div>
+          <div class="people-item"><h5>Hackathons</h5><p>1&ndash;2 day in-person sessions. Teams work alongside AI graduates to solve real problems.</p></div>
+          <div class="people-item"><h5>AI Champions</h5><p>1&ndash;2 per team. Bespoke training programme. Access to tools like Replit to build small solutions.</p></div>
+        </div>
+      </div>
+
+      <!-- Internal Project Strategy -->
+      <div class="strategy-card">
+        <div class="strategy-card-header" style="background:#1a5c5c">
+          <span style="font-size:22px">&#128640;</span>
+          <h3>Internal Project Strategy</h3>
+          <p>From ideation to live product &mdash; governed by the SPRB</p>
+        </div>
+        <div class="strategy-card-body">
+          <div class="pillar-stats" id="pillarStats"></div>
+          <h5 style="font-size:11px;text-transform:uppercase;color:#94a3b8;margin:0 0 8px;letter-spacing:1px">10-Day Rapid Feasibility Process</h5>
+          <div class="step-row"><div class="step-num">1</div><span class="step-text">Identify the Pain &rarr; AI Ideas chatbot</span></div>
+          <div class="step-row"><div class="step-num">2</div><span class="step-text">SPRB Review &rarr; Go / No-go / Hold</span></div>
+          <div class="step-row"><div class="step-num">3</div><span class="step-text">10-Day Feasibility &rarr; Prototype &amp; validate</span></div>
+          <div class="step-row"><div class="step-num">4</div><span class="step-text">Build &amp; Prioritise &rarr; AI grads + Champions deliver</span></div>
+          <div class="step-row"><div class="step-num">5</div><span class="step-text">Live Product &rarr; Embedded. Compounding value.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Four Pillar Cards -->
+    <div class="pillar-grid" id="pillarGrid"></div>
+
+    <!-- AI Workforce Tools Calculator -->
+    <div class="calc-section">
+      <div class="calc-header">
+        <div class="calc-header-top">
+          <span style="font-size:28px">&#128736;&#65039;</span>
+          <div>
+            <h3>AI Workforce Tools</h3>
+            <p>Model the cost of embedding AI tools across the organisation. Adjust headcounts per tool to explore different rollout scenarios &mdash; from everyday productivity (Copilot, Claude, ChatGPT) to engineering and automation platforms (Codex, Replit, N8N).</p>
+          </div>
+        </div>
+      </div>
+      <div class="calc-body">
+        <div class="calc-tools-grid" id="calcGrid"></div>
+        <div class="calc-summary" id="calcSummary"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- PIPELINE VIEW -->
+  <div class="view-section" id="viewPipeline">
+    <div class="pipeline-grid" id="pipelineGrid"></div>
+  </div>
+
+  <!-- MATRIX VIEW -->
+  <div class="view-section" id="viewMatrix">
+    <div class="matrix-wrap">
+      <h3 class="matrix-title">Impact vs Effort Matrix</h3>
+      <p class="matrix-subtitle">Click any dot to see details. Dot size = priority score.</p>
+      <div class="matrix-plot" id="matrixPlot">
+        <div class="matrix-quadrant-label" style="top:20%;left:20%;color:rgba(16,185,129,0.25)">&#11088; Quick Wins</div>
+        <div class="matrix-quadrant-label" style="top:20%;right:15%;color:rgba(59,130,246,0.25)">&#127919; Major Bets</div>
+        <div class="matrix-quadrant-label" style="bottom:20%;left:22%;color:rgba(245,158,11,0.25)">Fill-ins</div>
+        <div class="matrix-quadrant-label" style="bottom:20%;right:18%;color:rgba(148,163,184,0.25)">Reconsider</div>
+        <div class="matrix-axis matrix-axis-h"></div>
+        <div class="matrix-axis matrix-axis-v"></div>
+        <div class="matrix-axis-label" style="bottom:4px;left:50%;transform:translateX(-50%)">EFFORT &rarr;</div>
+        <div class="matrix-axis-label" style="left:4px;top:50%;transform:translateY(-50%) rotate(-90deg)">IMPACT &rarr;</div>
+      </div>
+      <div class="matrix-legend">
+        <div class="matrix-legend-item"><div class="matrix-legend-dot" style="background:#10b981"></div><span class="matrix-legend-text">Quick Win</span></div>
+        <div class="matrix-legend-item"><div class="matrix-legend-dot" style="background:#3b82f6"></div><span class="matrix-legend-text">Major Bet</span></div>
+        <div class="matrix-legend-item"><div class="matrix-legend-dot" style="background:#f59e0b"></div><span class="matrix-legend-text">Fill-in</span></div>
+        <div class="matrix-legend-item"><div class="matrix-legend-dot" style="background:#94a3b8"></div><span class="matrix-legend-text">Reconsider</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CURRENT PROGRESS VIEW -->
+  <div class="view-section" id="viewProgress">
+    <h2 class="cp-section-title">AI Team &mdash; Current Workstreams</h2>
+    <p class="cp-section-sub">What each AI graduate is delivering right now. Status reflects their latest weekly catch-up (week ending 13 May 2026).</p>
+    <div class="detail-grid" id="progressGrid"></div>
+  </div>
+
+  <!-- PROPOSED PROJECTS VIEW -->
+  <div class="view-section" id="viewProposed">
+    <h2 class="cp-section-title">Proposed Next Big Projects</h2>
+    <p class="cp-section-sub">Four contenders for the next major investment. Compare value, effort and financial profile, then pick the right next bet to back.</p>
+    <div class="detail-grid" id="proposedGrid"></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<script>
+// === DATA ===
+const DATA=[{"category":"Audit & Surveying","title":"AI-Powered Asset Audits","users":"Asset auditors, Consulting clients","problem":"When asset auditors go out into the field they take notes and photos, then spend a day in the office writing up the report — taking valuable time away from field work.","solution":"Take their notes plus a voice memo recorded in the car at end of audit, transcribe and use AI to draft the audit report; auditor only QAs the output.","submitter":"Oliver Sanders","kpi":"Reduce admin time per job by 80%; +1 day/week field capacity per auditor","businessArea":"Consulting","impact":4,"effort":3,"reach":2,"confidence":3,"strategicFit":3,"timeToValue":3,"priorityScore":72,"progress":"Ideation","financialType":"Cost Saving","quadrant":"Major Bet","pillar":"Big Wins"},{"category":"Compliance & Quality","title":"Certification Pass/Fail Consistency Checking","users":"Compliance team, helpdesk agents","problem":"Ongoing inconsistencies in process of passing or failing certifications and documents — leading to confusion, delays, and compliance risk. Lack of clear criteria, standardised validation and system alignment results in unreliable outcomes.","solution":"AI agent to validate cert documents against ruleset; flag missing/expired/non-compliant certs and propose pass/fail with rationale.","submitter":"jit (via Rich)","kpi":"Reduce inconsistent pass/fail decisions; cut compliance breaches","businessArea":"CE","impact":4,"effort":4,"reach":3,"confidence":2,"strategicFit":3,"timeToValue":2,"priorityScore":36,"progress":"In Progress","financialType":"Cost Avoidance","quadrant":"Reconsider","pillar":"Low Hanging Fruit"},{"category":"Compliance & Quality","title":"Multi-Channel Communication QA","users":"Helpdesk agents, QA team, clients","problem":"Insufficient QA across inbound calls, outbound calls and email — risk of inconsistent service delivery, missed compliance and reduced CX. No structured QA framework currently in place.","solution":"AI sentiment + adherence checking across all channels (Pulse / rate-my-job / call transcript analytics). Highlights low-scoring interactions for coaching.","submitter":"Sentiment / Pulse / rate-my-job (via Rich)","kpi":"Increase QA coverage from sample to 100%; improve CSAT; flag compliance issues at source","businessArea":"CE","impact":4,"effort":3,"reach":3,"confidence":2,"strategicFit":3,"timeToValue":2,"priorityScore":48,"progress":"In Progress","financialType":"Cost Saving","quadrant":"Reconsider","pillar":"Low Hanging Fruit"},{"category":"Helpdesk & Reactive Ops","title":"Single-Pane Reactive Call Logging","users":"Helpdesk agents, engineers, clients","problem":"Agents currently access 3 systems (telephony, knowledge base, Concerto) to log a single reactive call. Fragmented process — slow, error-prone, manual cleansing.","solution":"Unified AI-assisted logging interface; speech-to-text + auto-fill from telephony into Concerto, surfaced KB suggestions, single screen.","submitter":"(via Rich)","kpi":"Reduce average call handling time; reduce post-call admin; cut data cleansing rework","businessArea":"CE","impact":5,"effort":4,"reach":4,"confidence":2,"strategicFit":3,"timeToValue":1,"priorityScore":30,"progress":"Ideation","financialType":"Cost Saving","quadrant":"Reconsider","pillar":"Low Hanging Fruit"},{"category":"Helpdesk & Reactive Ops","title":"Automated P1 Incident Communications (Hospitality)","users":"Pool 3 helpdesk team, hospitality clients","problem":"Pool 3 currently sends manual hourly updates to clients for every P1 incident. Time-consuming at volume; risk of inconsistent messaging.","solution":"Auto-generate hourly P1 update emails from Concerto job state; standardised template tone; reviewed/sent by agent or scheduled.","submitter":"Adam Porter / Gemma Scott","kpi":"Reduce time spent on P1 comms by 70%+; improve consistency; faster updates to client","businessArea":"CE","impact":3,"effort":2,"reach":2,"confidence":3,"strategicFit":2,"timeToValue":3,"priorityScore":54,"progress":"Ideation","financialType":"Cost Avoidance","quadrant":"Fill-in","pillar":"DIY Wins"},{"category":"Helpdesk & Reactive Ops","title":"Red Asset Approval Statement Automation","users":"Helpdesk agents, clients","problem":"Agents manually locate and deliver required approval statements for red assets during calls — slow, inconsistent messaging.","solution":"Auto-display the correct approval statement on agent screen, triggered by asset status; supports compliant client comms in real time.","submitter":"Gemma Scott","kpi":"Reduce call handling time; ensure 100% statement compliance","businessArea":"CE","impact":3,"effort":2,"reach":2,"confidence":3,"strategicFit":2,"timeToValue":3,"priorityScore":54,"progress":"Ideation","financialType":"Cost Saving","quadrant":"Fill-in","pillar":"DIY Wins"},{"category":"Jordon / CE","title":"Subcontractor Worksheet Transposition","users":"Jordon service team","problem":"High volumes of subcontractor worksheets must be manually transposed into Jordon format for processing.","solution":"Custom Azure Document Intelligence models classify and extract data from subcontractor worksheets; Logic App writes into Jordon worksheet templates.","submitter":"Jack Barnett","kpi":"Reduce manual transposition from 25–40 hrs/week to 2 hrs/week","businessArea":"CE","impact":4,"effort":3,"reach":2,"confidence":3,"strategicFit":2,"timeToValue":2,"priorityScore":32,"progress":"In Progress","financialType":"Cost Saving","quadrant":"Reconsider","pillar":"Low Hanging Fruit"},{"category":"Jordon / CE","title":"Timesheet Intelligence (Engineer & Driver Tracking)","users":"Jordon Payroll, engineers, drivers","problem":"Efficiently tracking engineers and drivers through their various stops — currently manual reconciliation against timesheets.","solution":"Use telematics + scheduled job data + AI matching to build accurate engineer/driver timesheets and surface anomalies for payroll.","submitter":"Emily","kpi":"Reduce payroll queries; improve timesheet accuracy; recover lost engineer time","businessArea":"CE","impact":4,"effort":4,"reach":2,"confidence":2,"strategicFit":2,"timeToValue":1,"priorityScore":8,"progress":"On Hold","financialType":"Cost Avoidance","quadrant":"Reconsider","pillar":"Low Hanging Fruit"},{"category":"Jordon / CE","title":"Tender Materials Extraction from Drawings","users":"Jordon estimating","problem":"Reading lists of materials from plans and collating for issue to suppliers for quotation — currently manual.","solution":"Vision-based AI to read engineering drawings; extract bill-of-materials and structure for supplier RFQ.","submitter":"Matt (Jordon)","kpi":"Reduce extraction time from ~5 hrs/week to minutes","businessArea":"CE","impact":4,"effort":4,"reach":2,"confidence":2,"strategicFit":2,"timeToValue":1,"priorityScore":8,"progress":"Ideation","financialType":"Cost Saving","quadrant":"Reconsider","pillar":"Low Hanging Fruit"},{"category":"Bid & Tender","title":"Tender / Methodology Writing (Jordon)","users":"Jordon bid team","problem":"Writing tender documents and project methodologies — repetitive, slow, inconsistent.","solution":"Custom GPT trained on Jordon's prior tenders, methodologies and capability content; drafts tender responses and project methodologies for bid manager review. Aligns with Consulting BD bid suite.","submitter":"Patrick (Jordon)","kpi":"Halve tender drafting time; improve consistency","businessArea":"CE","impact":4,"effort":2,"reach":2,"confidence":3,"strategicFit":3,"timeToValue":3,"priorityScore":108,"progress":"Ideation","financialType":"Revenue Generating","quadrant":"Quick Win","pillar":"DIY Wins"},{"category":"Bid & Tender","title":"Plan of Works Generator (Jordon)","users":"Jordon project managers","problem":"Creating project plans from proposals — repetitive structuring of similar phasing.","solution":"Custom GPT to generate plan-of-works structure from accepted proposal; outputs Gantt-friendly task list and resource estimates.","submitter":"Patrick (Jordon)","kpi":"Reduce plan-of-works drafting time","businessArea":"CE","impact":3,"effort":2,"reach":2,"confidence":3,"strategicFit":2,"timeToValue":3,"priorityScore":54,"progress":"Ideation","financialType":"Cost Saving","quadrant":"Fill-in","pillar":"DIY Wins"},{"category":"Jordon / CE","title":"Sales Order Validation & Epix Upload","users":"Jordon Finance","problem":"Uploading sales orders to Epix where source orders may have discrepancies — leading to rework.","solution":"AI-powered validation of sales order data against contract/PO references; auto-flag exceptions; structured push to Epix.","submitter":"Jane (Jordon Finance)","kpi":"Reduce sales order rework; improve Epix data quality","businessArea":"Finance","impact":3,"effort":3,"reach":1,"confidence":2,"strategicFit":2,"timeToValue":2,"priorityScore":8,"progress":"Ideation","financialType":"Cost Avoidance","quadrant":"Reconsider","pillar":"Low Hanging Fruit"},{"category":"Consulting Productivity","title":"Fee Proposal Builder GPT","users":"Consulting fee earners","problem":"Fee proposals drafted ad-hoc against rate cards — inconsistent and slow.","solution":"Custom GPT seeded with fee proposal templates and rate cards; drafts fee proposals from a brief.","submitter":"David Cronje","kpi":"Reduce fee proposal draft time; improve consistency","businessArea":"Consulting","impact":3,"effort":2,"reach":3,"confidence":3,"strategicFit":3,"timeToValue":3,"priorityScore":121.5,"progress":"Planning","financialType":"Revenue Generating","quadrant":"Quick Win","pillar":"DIY Wins"},{"category":"Consulting Productivity","title":"CV & Experience Writer GPT","users":"Consulting team (cross-discipline)","problem":"Generating CVs and project experience summaries for proposals is time-consuming and inconsistent.","solution":"GPT pulling from project register and prior CVs to generate tailored CV and case study text.","submitter":"David Cronje","kpi":"Reduce CV refresh time; improve targeting","businessArea":"Consulting","impact":3,"effort":2,"reach":3,"confidence":3,"strategicFit":3,"timeToValue":3,"priorityScore":121.5,"progress":"Planning","financialType":"Revenue Generating","quadrant":"Quick Win","pillar":"DIY Wins"},{"category":"QS & Surveying","title":"QS Take Off Assistant GPT","users":"QS team","problem":"Quantity take-offs are time-consuming, repetitive and error-prone.","solution":"GPT (eventually with vision) supporting quantity take off and draft schedules from drawings/specs.","submitter":"Ben Smith","kpi":"Reduce take-off time per project; reduce errors","businessArea":"Consulting","impact":3,"effort":4,"reach":2,"confidence":2,"strategicFit":3,"timeToValue":1,"priorityScore":9,"progress":"Planning","financialType":"Cost Saving","quadrant":"Reconsider","pillar":"Low Hanging Fruit"},{"category":"QS & Surveying","title":"QS Benchmarking Assistant GPT","users":"QS team","problem":"Benchmarking costs and rates against historic datasets currently manual.","solution":"GPT querying Bellrock/Industry cost data and returning benchmark ranges with rationale.","submitter":"Ben Smith","kpi":"Faster benchmark response on bids; improved win rate","businessArea":"Consulting","impact":3,"effort":3,"reach":2,"confidence":2,"strategicFit":3,"timeToValue":2,"priorityScore":24,"progress":"Planning","financialType":"Revenue Generating","quadrant":"Reconsider","pillar":"Low Hanging Fruit"},{"category":"QS & Surveying","title":"QS Certificates Assistant GPT","users":"QS team","problem":"Certificate drafting is repetitive template work.","solution":"GPT drafting certificates from project inputs against template library.","submitter":"Ben Smith","kpi":"Reduce certificate drafting time","businessArea":"Consulting","impact":3,"effort":2,"reach":2,"confidence":3,"strategicFit":2,"timeToValue":3,"priorityScore":54,"progress":"Planning","financialType":"Cost Saving","quadrant":"Fill-in","pillar":"DIY Wins"},{"category":"Bid & Tender","title":"QS Tender Analysis GPT","users":"QS team","problem":"Tender requirements analysis is detail-heavy and slow.","solution":"GPT summarising tender requirements and key actions into a structured kick-off pack.","submitter":"Ben Smith","kpi":"Faster tender kick-off; fewer missed requirements","businessArea":"Consulting","impact":3,"effort":2,"reach":2,"confidence":3,"strategicFit":3,"timeToValue":3,"priorityScore":81,"progress":"Planning","financialType":"Revenue Generating","quadrant":"Quick Win","pillar":"DIY Wins"},{"category":"QS & Surveying","title":"Accommodation Schedule Builder GPT","users":"QS team","problem":"Building accommodation schedules from room data is repetitive.","solution":"GPT structuring room data into accommodation schedules.","submitter":"Ben Smith","kpi":"Reduce schedule build time","businessArea":"Consulting","impact":2,"effort":3,"reach":1,"confidence":2,"strategicFit":2,"timeToValue":2,"priorityScore":5.3,"progress":"Planning","financialType":"Cost Saving","quadrant":"Reconsider","pillar":"Low Hanging Fruit"},{"category":"QS & Surveying","title":"Survey Photo Analyst GPT","users":"Building Surveyors","problem":"Survey photos require manual triage and defect-note drafting.","solution":"Vision GPT analyses survey photos and drafts defect notes; surveyor reviews/approves.","submitter":"Dan Green","kpi":"Reduce time per survey; consistent defect identification","businessArea":"Consulting","impact":4,"effort":3,"reach":2,"confidence":2,"strategicFit":3,"timeToValue":2,"priorityScore":32,"progress":"Planning","financialType":"Cost Saving","quadrant":"Reconsider","pillar":"Low Hanging Fruit"},{"category":"QS & Surveying","title":"Building Condition Survey Writer GPT","users":"Building Surveyors","problem":"Drafting condition survey narratives & ratings from notes is slow.","solution":"GPT drafts condition survey narratives and ratings using template structure and surveyor input.","submitter":"Dan Green","kpi":"Halve report drafting time","businessArea":"Consulting","impact":4,"effort":2,"reach":2,"confidence":3,"strategicFit":3,"timeToValue":3,"priorityScore":108,"progress":"Test","financialType":"Cost Saving","quadrant":"Quick Win","pillar":"DIY Wins"},{"category":"QS & Surveying","title":"Condition Database GPT","users":"Building Surveyors, Asset managers","problem":"Survey findings are not consistently structured into a searchable condition database.","solution":"GPT structures findings into a condition database schema for downstream analytics and lifecycle planning.","submitter":"Dan Green","kpi":"Improve dataset for lifecycle modelling; cross-survey insights","businessArea":"Consulting","impact":3,"effort":3,"reach":3,"confidence":2,"strategicFit":3,"timeToValue":2,"priorityScore":36,"progress":"Planning","financialType":"Revenue Generating","quadrant":"Reconsider","pillar":"Low Hanging Fruit"},{"category":"QS & Surveying","title":"Dilapidations GPT","users":"Building Surveyors","problem":"Dilapidations schedule items repetitive to draft.","solution":"GPT drafts dilapidations schedule items from condition findings.","submitter":"Dan Green","kpi":"Faster dilapidations production","businessArea":"Consulting","impact":3,"effort":2,"reach":2,"confidence":3,"strategicFit":2,"timeToValue":3,"priorityScore":54,"progress":"Planning","financialType":"Cost Saving","quadrant":"Fill-in","pillar":"DIY Wins"},{"category":"QS & Surveying","title":"Schedule of Condition GPT","users":"Building Surveyors","problem":"Schedules of condition with photo references are slow to compile.","solution":"GPT drafts schedules of condition with photo references from survey notes and image library.","submitter":"Dan Green","kpi":"Faster SoC production; better photo-text linking","businessArea":"Consulting","impact":3,"effort":2,"reach":2,"confidence":3,"strategicFit":2,"timeToValue":3,"priorityScore":54,"progress":"Planning","financialType":"Cost Saving","quadrant":"Fill-in","pillar":"DIY Wins"},{"category":"Compliance & Quality","title":"Building Regulations Plan Check GPT","users":"Building Regs surveyors, clients","problem":"Plan checks against Building Regulations are detail-heavy and slow.","solution":"GPT runs plan checks against current building regs; produces issue logs with rationale.","submitter":"Suzanne Buckley","kpi":"Reduce plan check time; improve consistency","businessArea":"Consulting","impact":4,"effort":3,"reach":3,"confidence":2,"strategicFit":3,"timeToValue":2,"priorityScore":48,"progress":"Planning","financialType":"Revenue Generating","quadrant":"Reconsider","pillar":"Low Hanging Fruit"},{"category":"Compliance & Quality","title":"Principal Designer PCI Support GPT","users":"Principal Designers","problem":"PCI compilation and evidence mapping is heavy admin.","solution":"GPT supports PCI compilation and maps evidence to required CDM categories.","submitter":"Suzanne Buckley","kpi":"Reduce PCI compilation time","businessArea":"Consulting","impact":3,"effort":2,"reach":2,"confidence":3,"strategicFit":2,"timeToValue":3,"priorityScore":54,"progress":"Planning","financialType":"Cost Saving","quadrant":"Fill-in","pillar":"DIY Wins"},{"category":"Consulting Productivity","title":"PM Forms Assistant GPT","users":"Project Managers","problem":"Standard PM forms repetitive to populate.","solution":"GPT populates standard PM forms from project inputs.","submitter":"James Ealden","kpi":"Reduce PM admin","businessArea":"Consulting","impact":3,"effort":2,"reach":2,"confidence":3,"strategicFit":2,"timeToValue":3,"priorityScore":54,"progress":"Planning","financialType":"Cost Saving","quadrant":"Fill-in","pillar":"DIY Wins"},{"category":"Marketing & Content","title":"Brochure Generator GPT","users":"Marketing team","problem":"Brochure production for sales/marketing is slow.","solution":"GPT drafts brochures from product input and brand template.","submitter":"David Cronje (handover Sam Perryman)","kpi":"Faster brochure turn-around","businessArea":"Marketing","impact":3,"effort":2,"reach":2,"confidence":3,"strategicFit":2,"timeToValue":3,"priorityScore":54,"progress":"Test","financialType":"Cost Saving","quadrant":"Fill-in","pillar":"DIY Wins"},{"category":"Marketing & Content","title":"PR Manager GPT","users":"Marketing / PR team","problem":"PR content drafting is fragmented.","solution":"GPT manages and drafts PR content for Bellrock.","submitter":"David Cronje (handover Sam Perryman)","kpi":"Faster PR cadence","businessArea":"Marketing","impact":2,"effort":2,"reach":2,"confidence":3,"strategicFit":2,"timeToValue":3,"priorityScore":36,"progress":"Test","financialType":"Cost Saving","quadrant":"Fill-in","pillar":"DIY Wins"},{"category":"Marketing & Content","title":"Brand Ambassador GPT","users":"Marketing team","problem":"Brand consistency across content is hard to enforce.","solution":"GPT acts as brand ambassador, advising on tone-of-voice, message and brand alignment.","submitter":"David Cronje (handover Sam Perryman)","kpi":"Improve brand consistency","businessArea":"Marketing","impact":2,"effort":2,"reach":2,"confidence":2,"strategicFit":2,"timeToValue":3,"priorityScore":24,"progress":"Test","financialType":"Cost Avoidance","quadrant":"Fill-in","pillar":"DIY Wins"},{"category":"Marketing & Content","title":"Email Marketing Manager GPT","users":"Marketing team","problem":"Email campaign content drafting is repetitive.","solution":"GPT drafts email marketing content tailored to audience and campaign brief.","submitter":"David Cronje (handover Sam Perryman)","kpi":"Higher campaign throughput","businessArea":"Marketing","impact":3,"effort":2,"reach":2,"confidence":3,"strategicFit":2,"timeToValue":3,"priorityScore":54,"progress":"Test","financialType":"Cost Saving","quadrant":"Fill-in","pillar":"DIY Wins"},{"category":"Marketing & Content","title":"Report / White Paper Generator GPT","users":"Marketing team, BD","problem":"Reports and white papers are time-consuming to produce.","solution":"GPT drafts reports and white papers from research input and brand template.","submitter":"David Cronje (handover Sam Perryman)","kpi":"Faster thought-leadership output","businessArea":"Marketing","impact":3,"effort":2,"reach":3,"confidence":3,"strategicFit":3,"timeToValue":3,"priorityScore":121.5,"progress":"Test","financialType":"Revenue Generating","quadrant":"Quick Win","pillar":"DIY Wins"},{"category":"Marketing & Content","title":"SEO Manager GPT","users":"Marketing team","problem":"SEO keyword research and content optimisation is fragmented.","solution":"GPT supports SEO content and keyword research/optimisation.","submitter":"David Cronje (handover Sam Perryman)","kpi":"Improve organic search performance","businessArea":"Marketing","impact":3,"effort":2,"reach":2,"confidence":3,"strategicFit":2,"timeToValue":3,"priorityScore":54,"progress":"Test","financialType":"Revenue Generating","quadrant":"Fill-in","pillar":"DIY Wins"},{"category":"Marketing & Content","title":"Bellrock Blog Poster GPT","users":"Marketing team","problem":"Blog content generation is slow and inconsistent.","solution":"GPT drafts blog posts for the website on supplied topics.","submitter":"David Cronje (handover Sam Perryman)","kpi":"Faster blog cadence","businessArea":"Marketing","impact":2,"effort":2,"reach":2,"confidence":3,"strategicFit":2,"timeToValue":3,"priorityScore":36,"progress":"Test","financialType":"Cost Saving","quadrant":"Fill-in","pillar":"DIY Wins"},{"category":"Marketing & Content","title":"Social Media Manager GPT","users":"Marketing team","problem":"Social media content cadence is hard to maintain.","solution":"GPT generates and schedules social posts.","submitter":"David Cronje (handover Sam Perryman)","kpi":"Higher posting cadence; consistent tone","businessArea":"Marketing","impact":2,"effort":2,"reach":2,"confidence":3,"strategicFit":2,"timeToValue":3,"priorityScore":36,"progress":"Test","financialType":"Cost Saving","quadrant":"Fill-in","pillar":"DIY Wins"},{"category":"Bid & Tender","title":"SI Bid Writer V30","users":"BD bid writers, IAC bid team, Consulting bid managers","problem":"Drafting responses to ITTs/RFPs is the single largest BD time sink. Multiple users currently use generic ChatGPT for this work.","solution":"Production-grade custom GPT for ITT/RFP drafting (live). Used by Jacob Carter, Mackenzie Cullen, Claire Hardy, Viola Sain, Rachael Comer, Matt Clayton, IAC Bid Mgmt and others. High-impact incumbent tool.","submitter":"David Cronje (multi-team adoption)","kpi":"Reduce ITT drafting time; raise scoring quality; broaden bid coverage","businessArea":"Consulting","impact":5,"effort":2,"reach":4,"confidence":3,"strategicFit":3,"timeToValue":3,"priorityScore":270,"progress":"Live","financialType":"Revenue Generating","quadrant":"Quick Win","pillar":"DIY Wins"},{"category":"Bid & Tender","title":"Bellrock Advisory Bid Writer V1","users":"Advisory bid team","problem":"Advisory bids need a tone-of-voice and content base distinct from SI work.","solution":"New version of SI Bid Writer seeded with more data and system prompt for Bellrock ToV while keeping high SI scoring patterns.","submitter":"David Cronje","kpi":"Improve Advisory bid scoring and ToV","businessArea":"Consulting","impact":4,"effort":2,"reach":3,"confidence":3,"strategicFit":3,"timeToValue":3,"priorityScore":162,"progress":"Planning","financialType":"Revenue Generating","quadrant":"Quick Win","pillar":"DIY Wins"},{"category":"Bid & Tender","title":"Red Reviewer (Pre-Submission Error Finder)","users":"Bid managers","problem":"Pre-submission red reviews are time-consuming and inconsistent.","solution":"GPT does pre-submission analysis and error finding (Beta, Live).","submitter":"David Cronje","kpi":"Reduce post-submission errors; faster red review","businessArea":"Consulting","impact":4,"effort":2,"reach":3,"confidence":3,"strategicFit":3,"timeToValue":3,"priorityScore":162,"progress":"Live","financialType":"Revenue Generating","quadrant":"Quick Win","pillar":"DIY Wins"},{"category":"Bid & Tender","title":"Standard Details — SQ Generator","users":"Bid managers","problem":"Standard SQ responses repetitive and re-keyed across submissions.","solution":"GPT supports completion of SQ responses from a structured library of Bellrock standard answers.","submitter":"David Cronje","kpi":"Faster SQ turn-around; consistency","businessArea":"Consulting","impact":4,"effort":2,"reach":3,"confidence":3,"strategicFit":3,"timeToValue":3,"priorityScore":162,"progress":"Planning","financialType":"Revenue Generating","quadrant":"Quick Win","pillar":"DIY Wins"},{"category":"Bid & Tender","title":"BD Tender Analysis (Beta)","users":"Bid managers","problem":"Tender kick-off analysis fragmented across team.","solution":"GPT analyses tenders and creates kick-off briefing notes (Beta, Live).","submitter":"David Cronje","kpi":"Faster bid kick-off; fewer missed requirements","businessArea":"Consulting","impact":4,"effort":2,"reach":3,"confidence":3,"strategicFit":3,"timeToValue":3,"priorityScore":162,"progress":"Live","financialType":"Revenue Generating","quadrant":"Quick Win","pillar":"DIY Wins"},{"category":"Bid & Tender","title":"Compliance Matrix Generator","users":"Bid managers","problem":"Compliance matrix production for tenders repetitive and high effort.","solution":"GPT creates compliance matrices for tender submissions (Live).","submitter":"David Cronje","kpi":"Faster compliance matrix; reduced compliance gaps","businessArea":"Consulting","impact":4,"effort":2,"reach":3,"confidence":3,"strategicFit":3,"timeToValue":3,"priorityScore":162,"progress":"Live","financialType":"Cost Saving","quadrant":"Quick Win","pillar":"DIY Wins"},{"category":"Bid & Tender","title":"SI Social Value Bid Writer","users":"Bid writers, social value lead","problem":"Drafting social value responses is specialist and time-heavy.","solution":"GPT drafts social value responses to SI bids (Live).","submitter":"David Cronje","kpi":"Faster social value section; higher scores","businessArea":"Consulting","impact":4,"effort":2,"reach":3,"confidence":3,"strategicFit":3,"timeToValue":3,"priorityScore":162,"progress":"Live","financialType":"Revenue Generating","quadrant":"Quick Win","pillar":"DIY Wins"},{"category":"Bid & Tender","title":"SI Case Study Generator","users":"Bid writers, marketing","problem":"Case studies are heavily reused but rarely refreshed.","solution":"GPT generates case studies from project register inputs (Live).","submitter":"David Cronje","kpi":"More case studies, on-brand and on-bid","businessArea":"Consulting","impact":3,"effort":2,"reach":3,"confidence":3,"strategicFit":3,"timeToValue":3,"priorityScore":121.5,"progress":"Live","financialType":"Revenue Generating","quadrant":"Quick Win","pillar":"DIY Wins"},{"category":"Bid & Tender","title":"SI Evaluator","users":"Bid managers","problem":"Internal evaluation of draft responses is subjective and slow.","solution":"GPT evaluates responses using evaluation matrices and scores them (Live).","submitter":"David Cronje","kpi":"More objective draft evaluation; pre-submission lift","businessArea":"Consulting","impact":3,"effort":2,"reach":3,"confidence":3,"strategicFit":2,"timeToValue":3,"priorityScore":81,"progress":"Live","financialType":"Revenue Generating","quadrant":"Quick Win","pillar":"DIY Wins"},{"category":"Bid & Tender","title":"SI Bid Manager","users":"Bid managers","problem":"Bid management process coordination is currently spreadsheet-driven.","solution":"GPT supports the bid management process — generating plans, compliance matrices, social value plans (Live).","submitter":"David Cronje (also used by Jacob Carter)","kpi":"Faster bid management; fewer dropped balls","businessArea":"Consulting","impact":3,"effort":2,"reach":3,"confidence":3,"strategicFit":2,"timeToValue":3,"priorityScore":81,"progress":"Live","financialType":"Cost Saving","quadrant":"Quick Win","pillar":"DIY Wins"},{"category":"Productivity & Knowledge","title":"Document & Contract Clause Analysis","users":"CE Compliance, IAC PMs, Concerto sales, Consulting","problem":"Reviewing long contracts and operational documents for specific clauses, product inclusions, obligations is slow and inconsistent.","solution":"GPT/agent to analyse uploaded contracts and operational documents — flag clauses, summarise obligations, extract named entities and dates. Mentioned by Noah Lawrenson (Concerto), Sisi Lagrem (IAC), Dave Vout (IAC PM), Chris Barber (Consulting Data) and Concerto users.","submitter":"Noah Lawrenson + Sisi Lagrem + Dave Vout + Concerto users","kpi":"Reduce contract review time; reduce missed clauses","businessArea":"Cross-Business","impact":4,"effort":3,"reach":4,"confidence":2,"strategicFit":3,"timeToValue":2,"priorityScore":64,"progress":"Ideation","financialType":"Cost Avoidance","quadrant":"Major Bet","pillar":"Big Wins"},{"category":"Productivity & Knowledge","title":"Customer & Market Research Agent","users":"BD, sales, marketing, consulting","problem":"Customer/market/legislation research currently manual and inconsistent in depth.","solution":"Deep-research / agentic GPT seeded with Bellrock customer template; pulls publicly available customer info, market data, regulatory context. Used today by John Smith (Digital), Taz Arif, Harriet Briggs, Noah Lawrenson, Catherine Cadzow, John Dearing.","submitter":"John Smith + Taz Arif + Harriet Briggs + Noah Lawrenson + John Dearing","kpi":"Faster customer/market intel for bids and BD","businessArea":"Cross-Business","impact":4,"effort":3,"reach":4,"confidence":3,"strategicFit":3,"timeToValue":2,"priorityScore":96,"progress":"Ideation","financialType":"Revenue Generating","quadrant":"Major Bet","pillar":"Big Wins"},{"category":"AI Platform & Tooling","title":"Code Writing & Refactoring (Codex / Claude Code)","users":"Engineering, SRE, AI/Innovation team","problem":"Engineers manually writing/refactoring code. Codex already proven; access constrained by shared credit pool.","solution":"Expand access to Codex / Claude Code across engineering. Multiple-factor productivity improvement reported by William Wildridge (AI/Innovation Director) and Declan Turner (SRE).","submitter":"William Wildridge + Declan Turner","kpi":"Multi-factor engineering productivity improvement; reduced delivery time","businessArea":"Technologies","impact":4,"effort":1,"reach":2,"confidence":3,"strategicFit":3,"timeToValue":3,"priorityScore":216,"progress":"Live","financialType":"Cost Saving","quadrant":"Quick Win","pillar":"DIY Wins"},{"category":"Data & Analytics","title":"Data Cleansing & Analysis Assistant","users":"Cross-business analysts, sales ops, finance","problem":"Day-to-day data cleansing and analysis is manual and repetitive. Many staff already self-serving with ChatGPT/Copilot.","solution":"Provide structured AI assistant (and Copilot Excel rollout) for cleansing, transformation, summarisation. Mentioned by Noah Lawrenson, David McFadyen, Lewis Ingham-Cook, Catherine Cadzow, Chris Barber, Luke Mutchell.","submitter":"Multiple (Noah, David McFadyen, Lewis, Catherine, Chris Barber, Luke)","kpi":"Reduce time-to-insight on routine data tasks","businessArea":"Cross-Business","impact":3,"effort":2,"reach":4,"confidence":3,"strategicFit":2,"timeToValue":3,"priorityScore":108,"progress":"Ideation","financialType":"Cost Saving","quadrant":"Quick Win","pillar":"DIY Wins"},{"category":"Productivity & Knowledge","title":"Customer Communications Drafter","users":"IAC, Technologies, Consulting","problem":"Customer comms (status updates, governance reporting, escalations) drafted ad-hoc.","solution":"GPT for tone-aligned customer comms drafting. Used today by Sisi Lagrem, Lewis Ingham-Cook, Rachael Comer.","submitter":"Sisi Lagrem + Lewis Ingham-Cook + Rachael Comer","kpi":"Faster comms; consistent tone","businessArea":"Cross-Business","impact":3,"effort":2,"reach":4,"confidence":3,"strategicFit":2,"timeToValue":3,"priorityScore":108,"progress":"Ideation","financialType":"Cost Saving","quadrant":"Quick Win","pillar":"DIY Wins"},{"category":"Compliance & Quality","title":"Compliance Policy Writing Assistant","users":"CE Compliance","problem":"Drafting and refining policies and operational compliance documents is slow.","solution":"GPT to refine drafted policies and trawl operational data into usable compliance information. Used today by David McFadyen.","submitter":"David McFadyen","kpi":"Faster policy refresh; consistency","businessArea":"CE","impact":3,"effort":2,"reach":2,"confidence":3,"strategicFit":2,"timeToValue":3,"priorityScore":54,"progress":"Ideation","financialType":"Cost Saving","quadrant":"Fill-in","pillar":"DIY Wins"},{"category":"Productivity & Knowledge","title":"Concerto Product Q&A (RAG over SharePoint)","users":"Concerto sales, support, customers","problem":"Concerto product information scattered across SharePoint; sales/support manually search and synthesise.","solution":"RAG agent over Concerto SharePoint to answer product/feature questions; enables self-serve and faster sales/support response.","submitter":"Concerto team (multiple anonymous)","kpi":"Faster sales response; reduce 'where is that doc' time","businessArea":"Concerto","impact":4,"effort":3,"reach":3,"confidence":2,"strategicFit":3,"timeToValue":2,"priorityScore":48,"progress":"Ideation","financialType":"Cost Saving","quadrant":"Reconsider","pillar":"Low Hanging Fruit"},{"category":"Data & Analytics","title":"Address & Geo-Coordinate Extraction","users":"Consulting Data Reporting","problem":"Bulk address extraction and Lat/Long lookup against large customer datasets is manual.","solution":"Workflow / GPT to extract addresses and resolve to Lat/Long at scale. Used today by Chris Barber.","submitter":"Chris Barber","kpi":"Reduce data prep time on geo-tagged datasets","businessArea":"Consulting","impact":2,"effort":2,"reach":1,"confidence":3,"strategicFit":1,"timeToValue":3,"priorityScore":9,"progress":"In Use","financialType":"Cost Saving","quadrant":"Fill-in","pillar":"DIY Wins"},{"category":"AI Platform & Tooling","title":"Microsoft 365 Copilot Rollout (Excel focus)","users":"All staff","problem":"Many staff lack reliable AI access in their core productivity tools, especially Excel.","solution":"Roll out and train M365 Copilot, with Excel-heavy users prioritised. Sisi Lagrem and Dave Vout already getting value.","submitter":"Sisi Lagrem + Dave Vout","kpi":"Broad productivity uplift; Excel power-user enablement","businessArea":"Cross-Business","impact":3,"effort":2,"reach":5,"confidence":2,"strategicFit":2,"timeToValue":2,"priorityScore":60,"progress":"Ideation","financialType":"Cost Saving","quadrant":"Quick Win","pillar":"DIY Wins"},{"category":"Customer Service","title":"AI Customer Support / HubSpot Helper","users":"Tech support team","problem":"Troubleshooting HubSpot-related issues, integration queries and industry-specific support questions consumes support time.","solution":"GPT seeded with Bellrock support knowledge for HubSpot, integrations, FM-domain Q&A.","submitter":"(Anonymous, Tech Support)","kpi":"Reduce ticket time; deflect routine queries","businessArea":"Technologies","impact":3,"effort":3,"reach":2,"confidence":2,"strategicFit":2,"timeToValue":2,"priorityScore":16,"progress":"Ideation","financialType":"Cost Saving","quadrant":"Reconsider","pillar":"Low Hanging Fruit"},{"category":"Productivity & Knowledge","title":"Storyboard / Workflow Generator Toolkit","users":"IAC Growth, BD, sales ops","problem":"Building bespoke commercial workflows (commission tracker, market analysis, selectivity) is manual.","solution":"Toolkit of agents/custom GPTs for storyboard, workflow creation, local HTML tools. Used today by John Dearing.","submitter":"John Dearing","kpi":"Faster bespoke tool build for sales ops","businessArea":"IAC","impact":3,"effort":3,"reach":2,"confidence":2,"strategicFit":2,"timeToValue":2,"priorityScore":16,"progress":"In Use","financialType":"Cost Saving","quadrant":"Reconsider","pillar":"Low Hanging Fruit"},{"category":"AI Platform & Tooling","title":"AI Evaluation Simulator & Feedback Tool","users":"IAC Growth, BD","problem":"Evaluating drafts against scoring rubrics is subjective.","solution":"Simulator + feedback tool to evaluate drafts using scoring rubrics. Used today by John Dearing. Adjacent to BD's SI Evaluator.","submitter":"John Dearing","kpi":"More objective draft evaluation","businessArea":"IAC","impact":3,"effort":3,"reach":2,"confidence":2,"strategicFit":2,"timeToValue":2,"priorityScore":16,"progress":"In Use","financialType":"Cost Saving","quadrant":"Reconsider","pillar":"Low Hanging Fruit"},{"category":"AI Platform & Tooling","title":"Bellrock AI Gateway (Internal Inference)","users":"All Bellrock developers","problem":"Need a managed gateway for all internal LLM inferencing across Bellrock.","solution":"Foundational platform — Bellrock AI Gateway. Already in use by William Wildridge's team. Critical enabler for every other AI use case.","submitter":"William Wildridge","kpi":"Enables every other AI use case; cost control, security, observability","businessArea":"Technologies","impact":5,"effort":3,"reach":5,"confidence":3,"strategicFit":3,"timeToValue":3,"priorityScore":225,"progress":"Live","financialType":"Cost Avoidance","quadrant":"Major Bet","pillar":"Big Wins"},{"category":"AI Platform & Tooling","title":"Bellrock AI Portal (Rapid LLM App Build)","users":"Bellrock developers, business users","problem":"Need a way to rapidly stand up internal LLM-powered tools.","solution":"Foundational platform — Bellrock AI Portal. Already in use. Enables business teams to build AI workflows quickly.","submitter":"William Wildridge","kpi":"Faster AI prototyping and rollout","businessArea":"Technologies","impact":5,"effort":3,"reach":5,"confidence":3,"strategicFit":3,"timeToValue":3,"priorityScore":225,"progress":"Live","financialType":"Cost Saving","quadrant":"Major Bet","pillar":"Big Wins"},{"category":"Data & Analytics","title":"Industry-Standard Asset Master Data (Concerto)","users":"Account managers, clients, Concerto users","problem":"Asset data is inconsistent across Concerto Tom and SaaS. No industry-standard master data for grouping asset information, which surfaces in reporting as data-quality issues. Currently evident every reporting cycle.","solution":"Adopt an industry-standard taxonomy (e.g. Uniclass / NRM / SFG20 / IFC) as master data; AI-assisted mapping and normalisation of existing inconsistent asset records into the standard. Foundational for every downstream analytics and AI use case on Concerto data. Scope: Internal and Concerto. Data sensitivity: low.","submitter":"Amber Dagia (Data and Insights)","kpi":"Improved data quality; error reduction; better client experience in reporting","businessArea":"Concerto","impact":4,"effort":4,"reach":4,"confidence":2,"strategicFit":3,"timeToValue":1,"priorityScore":24,"progress":"Ideation","financialType":"Cost Avoidance","quadrant":"Reconsider","pillar":"Low Hanging Fruit"},{"category":"Productivity & Knowledge","title":"PowerPoint Deck Generation for PMs","users":"PM team, Digital Delivery, Project Sunrise","problem":"PMs spend ~1 hour a day creating PowerPoint decks for the business instead of delivering on projects. Repetitive structuring eats into delivery capacity.","solution":"Custom GPT seeded with Bellrock template, brand voice and standard PM deck structures; generates draft decks from project status notes. Pair with the Bellrock PowerPoint skill already available via Claude. Submitted via Ideas chatbot.","submitter":"Robert Bowell (Digital Delivery)","kpi":"Recover ~5 hours/week per PM; reduce time spent on slide-pushing vs delivery","businessArea":"Cross-Business","impact":3,"effort":2,"reach":4,"confidence":3,"strategicFit":2,"timeToValue":3,"priorityScore":108,"progress":"Ideation","financialType":"Cost Saving","quadrant":"Quick Win","pillar":"DIY Wins"},{"category":"Productivity & Knowledge","title":"Visio Flowchart AI Agent (Project Sunrise)","users":"PMs and BAs working on Project Sunrise / Deltek configuration","problem":"Processing 40+ Visio flowcharts as part of Project Sunrise for Deltek configuration. Manual edits and standardisation across the set is time-consuming.","solution":"AI agent that parses Visio flowcharts, supports edit and bulk standardisation across the set. Output: standardised process flows the business can sign off and use to configure Deltek.","submitter":"Robert Bowell (Digital Delivery)","kpi":"Faster cycle time on process flow standardisation; better quality product for Deltek","businessArea":"Cross-Business","impact":3,"effort":3,"reach":3,"confidence":2,"strategicFit":2,"timeToValue":2,"priorityScore":24,"progress":"Ideation","financialType":"Cost Saving","quadrant":"Reconsider","pillar":"Low Hanging Fruit"},{"category":"Sustainability","title":"Energy Saving Discovery Tool","users":"Energy & Sustainability team, ~56 FMs","problem":"FMs need to discover and share new energy saving methods across the portfolio. Currently 1-2 hours/week on research and circulation.","solution":"RAG-style agent over an indexed library of energy saving best practices, regulatory updates and case studies. Personalised recommendations per FM and per portfolio. Surfaces calorific savings opportunities.","submitter":"Lewis Protheroe (Energy & Sustainability)","kpi":"Calorific energy savings; faster circulation of best practice; improved sustainability KPIs","businessArea":"IAC","impact":3,"effort":2,"reach":3,"confidence":2,"strategicFit":3,"timeToValue":3,"priorityScore":81,"progress":"Ideation","financialType":"Cost Saving","quadrant":"Quick Win","pillar":"DIY Wins"},{"category":"Compliance & Quality","title":"Supplier Annual Re-verification","users":"Procurement team; 1400 suppliers; 100 clients","problem":"Supplier onboarding info isn't periodically re-verified. Should happen annually but currently doesn't happen at all — significant compliance and supply-chain risk.","solution":"AI agent re-verifies submitted supplier info annually against public sources (Companies House, insurance registers, accreditations). Flags expired certs, ownership changes, financial red flags. Supplier portal nudges for refreshed docs.","submitter":"Procurement (via Ideas chatbot)","kpi":"Huge risk reduction across 1400 suppliers; reduce P&L impact from supply-chain failures","businessArea":"Cross-Business","impact":4,"effort":3,"reach":4,"confidence":2,"strategicFit":3,"timeToValue":2,"priorityScore":64,"progress":"Ideation","financialType":"Cost Avoidance","quadrant":"Major Bet","pillar":"Big Wins"},{"category":"Customer Service","title":"Auto Customer Job Status Updates","users":"Central Operations CE team (5 currently doing this manually); CE clients","problem":"Customer status updates (job accepted, engineer on site, parts required, completed) are sent manually on an ad-hoc basis. Goes against client excellence standards. Customers feel the pain of missing updates.","solution":"Event-driven update system over Concerto job state. Auto-generates branded customer comms at each job stage. Optional client-portal view. 'Amazon-style' visibility into reactive jobs.","submitter":"Anna Cain (Central Operations - CE)","kpi":"Time saved (~5 FTE-equiv); client confidence; NPS uplift; client excellence delivery","businessArea":"CE","impact":4,"effort":3,"reach":4,"confidence":3,"strategicFit":3,"timeToValue":2,"priorityScore":96,"progress":"Ideation","financialType":"Cost Avoidance","quadrant":"Major Bet","pillar":"Big Wins"},{"category":"Helpdesk & Reactive Ops","title":"Engineer Post-Visit Review Automation","users":"Central Ops Critical Engineering; 4 reviewers; 70+ engineers","problem":"Every engineer visit needs a post-visit review (PVR) before the job can progress and be billed. ~100 PVRs/day at 2-10 mins each — a daily bottleneck for 4 people. Slows billing and customer updates.","solution":"AI auto-checks engineer reports for completeness, photos, parts used, time on site. Flags exceptions for human review only. Auto-progresses clean jobs through workflow. Lifts speed without dropping quality.","submitter":"Jamie (Central Operations - Critical Engineering)","kpi":"~100 PVRs/day automated; faster billing cycle; faster customer comms; improved CSAT","businessArea":"CE","impact":4,"effort":3,"reach":4,"confidence":2,"strategicFit":3,"timeToValue":2,"priorityScore":64,"progress":"Ideation","financialType":"Cost Saving","quadrant":"Major Bet","pillar":"Big Wins"},{"category":"Helpdesk & Reactive Ops","title":"Engineer Travel Time & Route Efficiency","users":"3 planners; 70+ engineers; CE clients","problem":"Engineer routing/scheduling is currently manual. Inefficient travel time, missed SLAs, suboptimal utilisation. >100 jobs logged daily across the team.","solution":"AI/ML route optimisation using engineer location, skills, SLAs, traffic. Auto-suggests optimal job assignment and travel order. Integrates with Concerto job state and engineer mobile.","submitter":"CE Operations (via Ideas chatbot)","kpi":"Cost reduction on travel; +utilisation; faster SLA hits; NPS uplift","businessArea":"CE","impact":5,"effort":4,"reach":4,"confidence":2,"strategicFit":3,"timeToValue":1,"priorityScore":30,"progress":"Ideation","financialType":"Revenue Generating","quadrant":"Reconsider","pillar":"Low Hanging Fruit"},{"category":"Audit & Surveying","title":"Asset Capture Firework (Strategic engagement)","users":"Consulting Surveying team; IAC asset surveyors; downstream Concerto/Mobiess","problem":"6-facet asset surveys are heavily manual: a surveyor stands in a room, counts kit, marks on a drawing, types into a spreadsheet. Slow, inconsistent, error-prone — and at scale (1700 surveys for one IAC client by July 2027).","solution":"Helmet/phone camera + AI vision auto-identifies assets in a room against an NRM3 / Uniclass taxonomy; voice narration captures context; populates structured survey data and drops into Concerto/Mobiess. Builds on Rohan's element identification prototype. Strategic firework build (8 weeks). The 'Rolex on, sleeve pulled up' moment for the AI team.","submitter":"JJ + David Cronje + Taz Arif + Ben Smith + Rohan Anand","kpi":"Replace bulk of manual surveying time at scale; competitive advantage in survey quality & speed; foundational data feed for all downstream analytics","businessArea":"Consulting","impact":5,"effort":4,"reach":4,"confidence":3,"strategicFit":3,"timeToValue":2,"priorityScore":90,"progress":"In Progress","financialType":"Revenue Generating","quadrant":"Major Bet","pillar":"Big Wins"},{"category":"Data & Analytics","title":"QS Cost Management & Benchmarking Platform (Firework #2)","users":"QS team; Building Surveyors; sales/BD; ultimately senior clients","problem":"Bellrock's Consulting division holds 100+ years of cost data across acquired businesses, fragmented across Excel, Deltek and legacy systems. QS teams rely on BCIS or personal experience for benchmarking. An Excel-based benchmarking tool exists but doesn't scale. ~80% of cost plans come from benchmark data; only ~20% are project-specific abnormals. No QS practice has solved this well today.","solution":"Partner-led firework build (6-8 weeks). Four core capabilities: (1) centralised cost data repository ingesting + normalising historical data across acquired businesses; (2) intelligent benchmarking engine queryable by building type, sector, region with time + location adjustment; (3) AI-assisted cost plan generation from building brief; (4) abnormal identification for the ~20% bespoke items. Phase 2: drawing analysis. Extended vision: total cost of occupation -- capital + hard FM + soft FM + carbon -- a market-unique proposition vs CBRE Cost Lab / T&T. Formal Consulting SLT commitment.","submitter":"Dan (Consulting SLT) -- sponsor; David Cronje + Ben Smith -- delivery leads","kpi":"Bid pricing accuracy; pre-bid benchmark answers in seconds; differentiated 'total cost of occupation' proposition vs T&T / CBRE / BCIS; foundation for productised client offering","businessArea":"Consulting","impact":5,"effort":4,"reach":3,"confidence":3,"strategicFit":3,"timeToValue":2,"priorityScore":67.5,"progress":"Scoping","financialType":"Revenue Generating","quadrant":"Major Bet","pillar":"Big Wins"},{"category":"Compliance & Quality","title":"Portfolio Compliance Diagnostic","users":"Senior client execs (heads of portfolio); Bellrock advisory team","problem":"Senior leaders running large property portfolios are personally liable for compliance breaches across an ever-widening regulatory surface. Today they have no easy way to get an objective assessment of their compliance position across the portfolio.","solution":"AI compliance diagnostic: ingest large volumes of certification data + the latest regulatory framework; produce an executive-level objective assessment per asset and per portfolio. Surfaces gaps and personal liability hotspots. Plumb-and-play model — Bellrock as expert advisor, not the portfolio operator.","submitter":"Taz Arif","kpi":"Strategic advisory revenue; differentiated diagnostic offering; lands at senior exec / personal-liability level — the right altitude for Bellrock advisory growth","businessArea":"Consulting","impact":4,"effort":4,"reach":3,"confidence":2,"strategicFit":3,"timeToValue":1,"priorityScore":18,"progress":"Ideation","financialType":"Revenue Generating","quadrant":"Reconsider","pillar":"Low Hanging Fruit"},{"category":"Helpdesk & Reactive Ops","title":"Proactive Supplier Chase System (firework candidate)","users":"CE Operations, supply chain, suppliers, clients","problem":"Currently chasing overdue work — thousands of PPMs/week, manual phone chasing 48 hours before completion. Wasted time on both sides. Clients see SLA breaches. Carlo wants stats on chases per reactive job today — we don't even have the data.","solution":"Multi-stage automated reminders to suppliers: 10 days, 5 days, 2 days before PPM/reactive due. Three-strikes escalation to supply chain team. Reduces manual chasing, frees CE FTE, lifts SLA hit rate. Carlo passionate — flagged as potential firework alongside Asset Capture. Adjacent to Auto Customer Job Status Updates (Anna Cain) but supplier-side rather than client-side.","submitter":"Carlo + James + CE Operations team","kpi":"Cut manual supplier chasing volume; recover CE FTE; lift SLA hit rate; provide chases-per-job metric that doesn't exist today","businessArea":"CE","impact":5,"effort":4,"reach":4,"confidence":3,"strategicFit":3,"timeToValue":2,"priorityScore":90,"progress":"Scoping","financialType":"Cost Saving","quadrant":"Major Bet","pillar":"Big Wins"},{"category":"Customer Service","title":"AI Voice Triage Agent (CE Helpdesk)","users":"CE Helpdesk team, suppliers, clients","problem":"Huge volume of inbound calls to CE helpdesk — time extension requests, status queries, supplier issues — consume significant FTE time. Many calls could be handled autonomously or routed more efficiently.","solution":"Voice agent answers inbound calls on Genesis call flows, triages to human for complex cases, handles simple queries autonomously (time extensions, status updates, supplier queries). Lifts capacity. Industry case: 70% more outbound calls handled after voice agent went live, same CSAT. Heavy Genesis integration across multiple call flows.","submitter":"James + CE Operations team","kpi":"Reduce call handling FTE; extend hours of coverage; cut wait times; standardise responses; provide call analytics","businessArea":"CE","impact":5,"effort":4,"reach":3,"confidence":2,"strategicFit":3,"timeToValue":1,"priorityScore":22.5,"progress":"Ideation","financialType":"Cost Saving","quadrant":"Reconsider","pillar":"Low Hanging Fruit"},{"category":"Helpdesk & Reactive Ops","title":"Supplier-Specific Data Distribution","users":"CE Operations service coordinators; supply chain; suppliers","problem":"Service coordinators manually extract data from Concerto/Power BI and segment by supplier to send out. Multiple people doing the same extract in parallel. Wasted FTE time across multiple coordinators.","solution":"Power Automate flow that pulls supplier-grouped data from Concerto (via SQL read layer), generates one file/email per supplier with their open jobs, sends Monday morning. Includes AI-written commentary explaining priority items. Tier-1 partner to the Proactive Supplier Chase System.","submitter":"CE Operations team","kpi":"Eliminate parallel data extraction across coordinators; consistent supplier comms; foundation for chase system","businessArea":"CE","impact":3,"effort":2,"reach":3,"confidence":3,"strategicFit":3,"timeToValue":3,"priorityScore":121.5,"progress":"Ideation","financialType":"Cost Saving","quadrant":"Quick Win","pillar":"DIY Wins"},{"category":"Productivity & Knowledge","title":"AI Avatar Training Videos (Hey Gen / Synthesia)","users":"Training delivery, supplier onboarding, customer training, internal upskilling","problem":"Manual delivery of training content (modular courses, supplier onboarding, customer programmes) requires specific instructors who become bottlenecks. Hard to scale, hard to refresh, hard to update — and content can disappear when the trainer leaves.","solution":"Use HeyGen or Synthesia to convert PowerPoint training content + transcripts into AI avatar-delivered video courses. Proven externally (Rich's previous role: AI-avatar ISO training sold at £500/pop). At Bellrock: supplier onboarding training, internal Concerto training, customer comms training. Joy as in-house avatar option for Bellrock-branded delivery.","submitter":"Rich Merrett + CE Operations + L&D","kpi":"Faster training rollout; consistent message at scale; resilience to trainer turnover; potential revenue stream for client-facing training","businessArea":"Cross-Business","impact":4,"effort":2,"reach":4,"confidence":3,"strategicFit":2,"timeToValue":3,"priorityScore":144,"progress":"Scoping","financialType":"Cost Saving","quadrant":"Quick Win","pillar":"DIY Wins"},{"category":"Data & Analytics","title":"AI Commentary on Performance Reports","users":"Account directors, finance, leadership teams","problem":"Utilisation reports, performance dashboards lack narrative. Account directors see numbers without story. Different accounts/MDs need different cuts of the same data — currently means manually re-creating the same report multiple times.","solution":"AI generates plain-language commentary on Power BI / utilisation reports — 'out of 2000 jobs, 1800 succeeded; X% failure rate driven by supplier Y; recommended action Z'. Per-account narratives that land differently than raw numbers. Sits on top of read-only SQL layer.","submitter":"James + CE Operations + Amber Dagia","kpi":"More actionable performance reporting; reduces 'oh who is annoyed this morning' management style; data-driven account conversations","businessArea":"Cross-Business","impact":3,"effort":2,"reach":3,"confidence":3,"strategicFit":2,"timeToValue":3,"priorityScore":81,"progress":"Ideation","financialType":"Cost Saving","quadrant":"Quick Win","pillar":"DIY Wins"},{"category":"Productivity & Knowledge","title":"Personalised Concerto Training Bot","users":"All Concerto users — CE Operations, helpdesk, finance, supplier portal","problem":"Suppliers and users get blanket training but performance varies. No adaptive coaching or refresher pathway. Knowledge gaps cause downstream errors — supplier onboarding mistakes ripple into the order-to-cash cycle.","solution":"Adaptive learning agent that knows what each user has covered, monitors their actions in Concerto, surfaces refreshers when they get something wrong. ML-driven. Bigger build than other training items but compounds with avatar training videos.","submitter":"Rich Merrett + L&D","kpi":"Reduce supplier onboarding errors; shorten time-to-competence; improve cash-conversion cycle indirectly","businessArea":"Cross-Business","impact":4,"effort":4,"reach":4,"confidence":2,"strategicFit":2,"timeToValue":1,"priorityScore":16,"progress":"Ideation","financialType":"Cost Avoidance","quadrant":"Reconsider","pillar":"Low Hanging Fruit"},{"category":"Customer Service","title":"WhatsApp Business P1 Notifications","users":"Restaurant/hospitality clients, CE Operations","problem":"Clients during P1 incidents (restaurant down) say they want hourly email updates — but emails aren't opened in the moment. Clients are panicking, phone-in-hand. Email is the wrong channel for the urgent moment.","solution":"WhatsApp Business push notifications for P1 status changes — much higher real-time engagement than email. Complements rather than replaces existing email comms (so we still keep audit trail). Measure open rates against current email baseline first.","submitter":"James + CE Operations team","kpi":"Higher real-time engagement during P1s; better CX during incidents; lower follow-up call volume","businessArea":"CE","impact":3,"effort":3,"reach":3,"confidence":2,"strategicFit":2,"timeToValue":2,"priorityScore":24,"progress":"Ideation","financialType":"Cost Avoidance","quadrant":"Reconsider","pillar":"Low Hanging Fruit"},{"category":"Helpdesk & Reactive Ops","title":"P1 Email Open Rate Analytics","users":"CE Operations; restaurant/hospitality clients","problem":"We send hourly P1 update emails as a contractual commitment but have no idea whether clients actually read them. Significant FTE goes into producing these — need evidence to either justify or change the practice.","solution":"Quick analytics piece: measure email open rates on existing P1 hourly updates. Inform whether to keep the cadence, move to WhatsApp, or rationalise. Low-effort, high-value as a diagnostic before bigger comms changes.","submitter":"James + CE Operations team","kpi":"Evidence base for P1 comms strategy; could free meaningful FTE if open rates are low","businessArea":"CE","impact":3,"effort":1,"reach":3,"confidence":3,"strategicFit":2,"timeToValue":3,"priorityScore":162,"progress":"Ideation","financialType":"Cost Saving","quadrant":"Quick Win","pillar":"DIY Wins"},{"category":"Helpdesk & Reactive Ops","title":"Engineer Redeployment (Cross-Business)","users":"CE, IAC, Jordon service planners; engineers across BUs","problem":"Forward-looking redeployment of engineers across business units is manual / ad-hoc. CE may have engineers without work while IAC has unallocated jobs; Jordon engineers spread thinly across the country. Power BI dashboards show retrospectively but no forward redeployment logic. Carlo flagged: 'throwing out £100-200k/day of M&E jobs'.","solution":"ML + AI model that, looking forward, identifies engineer availability and unallocated jobs across BUs (CE, IAC, Jordon) and suggests redeployment. Direct P&L impact this year. Mark Brown sponsoring; Rich + Amber co-leading on the data/AI piece. Carlo asked for plan + delivery date by next board.","submitter":"Carlo (priority) + Mark Brown (sponsor) + James + Rich + Amber","kpi":"M&E revenue captured; engineer utilisation %; reduced bench time; cross-BU capacity sharing","businessArea":"CE","impact":5,"effort":3,"reach":4,"confidence":2,"strategicFit":3,"timeToValue":3,"priorityScore":120,"progress":"Scoping","financialType":"Revenue Generating","quadrant":"Major Bet","pillar":"Big Wins"},{"category":"Audit & Surveying","title":"Location Data Grab as a Service","users":"Consulting surveyors, asset surveying team, clients","problem":"Asset surveys need location data in Concerto/Mobiess. Clients often don't have it; currently they pay someone else to collect it. Bellrock loses both the revenue and ends up dependent on third-party quality.","solution":"Bellrock offers location data collection as a service — either charged separately or wrapped into surveys. Workshop 10 June in Liverpool (Rich, Dan Green, Alan Smith) to decide build vs buy. Extension of Asset Capture / digitization of surveying. Relevant to Wakefield Discovery.","submitter":"Dan Green + Alan Smith + Rich Merrett","kpi":"New revenue stream; reduced dependency on client-provided data; survey throughput uplift","businessArea":"Consulting","impact":3,"effort":3,"reach":3,"confidence":2,"strategicFit":3,"timeToValue":2,"priorityScore":36,"progress":"Scoping","financialType":"Revenue Generating","quadrant":"Reconsider","pillar":"Low Hanging Fruit"},{"category":"Compliance & Quality","title":"Lens Job Sheet Validation","users":"Lens validation team, suppliers","problem":"Job sheets attached by suppliers to Lens are manually reviewed to confirm engineer + onsite client signatures, valid job dates, and recorded times appear complete. Time-consuming and error-prone; contributes to PNL leakage when invalid sheets slip through.","solution":"AI vision parses uploaded job sheet PDFs/images. Detects presence of signatures (engineer + onsite client), valid job dates, and time records that look complete. Flags exceptions for human review only. From Dershana Jagiwala — meeting scheduled.","submitter":"Dershana Jagiwala (Lens)","kpi":"Reduce manual job-sheet review time; cut SLA disputes; improve cash-conversion cycle indirectly","businessArea":"CE","impact":4,"effort":2,"reach":3,"confidence":3,"strategicFit":3,"timeToValue":3,"priorityScore":162,"progress":"Ideation","financialType":"Cost Avoidance","quadrant":"Quick Win","pillar":"DIY Wins"},{"category":"Compliance & Quality","title":"Lens Invoice Validation","users":"Lens validation team, finance, suppliers","problem":"Currently 100% of supplier invoices coming into Lens are manually validated. Significant resource time consumed -- AI could assist and free that team for higher-value work.","solution":"AI invoice validation -- match supplier invoice against PO, job sheet, time records, and historic patterns. Auto-pass clean invoices; flag exceptions only. Pairs naturally with Job Sheet Validation.","submitter":"Dershana Jagiwala (Lens)","kpi":"Free Lens validators from 100% manual review; faster invoice processing; cash conversion lift","businessArea":"Finance","impact":4,"effort":3,"reach":3,"confidence":3,"strategicFit":3,"timeToValue":2,"priorityScore":72,"progress":"Ideation","financialType":"Cost Saving","quadrant":"Major Bet","pillar":"Big Wins"},{"category":"Marketing & Content","title":"Executive Voice Programme (Carlo + 4 MDs)","users":"Carlo, 4 MDs, Group Marketing","problem":"External agency cost of ~£10k/month for executive LinkedIn voice production. Tone consistency hard to maintain across SLT.","solution":"Weekly LinkedIn production cycle using Claude. Carlo's programme is LIVE (Week 1 published this week). Scaling to 4 MDs next. Displaces £10k/month agency cost = £120k/year. Built and proven by Arunn Ramadoss.","submitter":"Arunn Ramadoss (Group Marketing Director)","kpi":"£120k/year agency cost displaced; LinkedIn engagement growth; consistent executive voice across SLT","businessArea":"Marketing","impact":5,"effort":2,"reach":2,"confidence":3,"strategicFit":3,"timeToValue":3,"priorityScore":135,"progress":"Live","financialType":"Cost Saving","quadrant":"Quick Win","pillar":"DIY Wins"},{"category":"Marketing & Content","title":"Executive Voice Agent (DGM Template)","users":"DGMs across business units","problem":"DGMs need to run their MD's LinkedIn voice programme independently without bottlenecking through central marketing.","solution":"Template / agent built by Arunn Ramadoss. Lets each DGM run their MD's voice programme independently using the Brand Voice System and Executive Voice patterns.","submitter":"Arunn Ramadoss","kpi":"Decentralised voice production; freed central marketing capacity","businessArea":"Marketing","impact":4,"effort":1,"reach":3,"confidence":3,"strategicFit":2,"timeToValue":3,"priorityScore":216,"progress":"Live","financialType":"Cost Saving","quadrant":"Quick Win","pillar":"DIY Wins"},{"category":"Marketing & Content","title":"Brand Voice System","users":"All marketing, agency partners, anyone producing Bellrock content","problem":"Tone consistency across all Bellrock content was inconsistent. Voice principles weren't codified or accessible.","solution":"Tone principles, vocabulary, writing rules -- codified as a deployable Claude skill. Every piece of Bellrock content uses it today. Built and Live.","submitter":"Arunn Ramadoss","kpi":"Consistent voice across every channel; lower edit cycles; cleaner brand","businessArea":"Marketing","impact":4,"effort":1,"reach":4,"confidence":3,"strategicFit":3,"timeToValue":3,"priorityScore":432,"progress":"Live","financialType":"Cost Saving","quadrant":"Quick Win","pillar":"DIY Wins"},{"category":"Marketing & Content","title":"Brand Design System","users":"Marketing, sub-brand teams, agency partners","problem":"11 sub-brands need consistent colours, typography, logos. Slow to roll out previously.","solution":"Brand design system -- colours, typography, logos for all 11 sub-brands. Deployable in minutes. Live and in use.","submitter":"Arunn Ramadoss","kpi":"Faster sub-brand deployment; consistent visual identity; reduced design time","businessArea":"Marketing","impact":4,"effort":1,"reach":4,"confidence":3,"strategicFit":3,"timeToValue":3,"priorityScore":432,"progress":"Live","financialType":"Cost Saving","quadrant":"Quick Win","pillar":"DIY Wins"},{"category":"Marketing & Content","title":"Campaign Brief Skill","users":"Marketing team, demand gen team","problem":"Inconsistent quality across campaign briefs. Manual structuring time eats into campaign delivery.","solution":"Structured workflow Claude skill for planning and briefing campaigns. Built by Arunn; the next step is to scale across the demand gen team.","submitter":"Arunn Ramadoss","kpi":"Consistent high-quality briefs; faster campaign kick-off; less rework","businessArea":"Marketing","impact":4,"effort":2,"reach":3,"confidence":3,"strategicFit":3,"timeToValue":3,"priorityScore":162,"progress":"In Progress","financialType":"Cost Saving","quadrant":"Quick Win","pillar":"DIY Wins"},{"category":"Marketing & Content","title":"Content & Creative Production Acceleration","users":"Marketing, content creators, agencies","problem":"Routine production work (variations, remixes, derivative content, asset resizing) consumes agency and contractor time that should be on higher-value creative thinking.","solution":"Use Brand Voice + Brand Design Systems to speed up production of variations, remixes and derivative content. Routine work moves to AI; human + agency time shifts to higher-value work.","submitter":"Arunn Ramadoss","kpi":"Faster in-house production; agency time redirected to higher-value work","businessArea":"Marketing","impact":4,"effort":2,"reach":3,"confidence":2,"strategicFit":3,"timeToValue":2,"priorityScore":72,"progress":"Planning","financialType":"Cost Saving","quadrant":"Quick Win","pillar":"DIY Wins"},{"category":"Marketing & Content","title":"Customer Success Stories Pipeline","users":"Marketing, BD, sales","problem":"No systematic pipeline of customer success stories. Slow, outsourced or simply not done.","solution":"AI-supported pipeline to draft, refine and publish customer success stories at cadence -- using the Brand Voice + Brand Design Systems for consistency.","submitter":"Arunn Ramadoss","kpi":"Steady drumbeat of customer stories; sales enablement asset library; lower agency spend","businessArea":"Marketing","impact":3,"effort":2,"reach":3,"confidence":2,"strategicFit":2,"timeToValue":2,"priorityScore":36,"progress":"Ideation","financialType":"Revenue Generating","quadrant":"Fill-in","pillar":"DIY Wins"},{"category":"Marketing & Content","title":"Sales Enablement Materials (In-House)","users":"BD, sales team, marketing","problem":"Sales enablement materials currently slow, outsourced or not done -- gaps in the BD toolkit.","solution":"Build sales enablement materials in-house, on demand. AI-enabled production using the same voice + design systems.","submitter":"Arunn Ramadoss","kpi":"On-demand sales enablement; faster BD ramp-up on new propositions; lower agency spend","businessArea":"Marketing","impact":3,"effort":2,"reach":3,"confidence":2,"strategicFit":2,"timeToValue":2,"priorityScore":36,"progress":"Ideation","financialType":"Revenue Generating","quadrant":"Fill-in","pillar":"DIY Wins"},{"category":"Marketing & Content","title":"AI-Assisted Marketing Reporting & Segmentation","users":"Marketing team, demand gen, leadership","problem":"Manual reporting and segmentation analysis; slow insight; high manual overhead in marketing operations.","solution":"Explore AI-assisted reporting and segmentation analysis -- better analysis, faster insight, less manual overhead. Later horizon (Q4).","submitter":"Arunn Ramadoss","kpi":"Faster insight cycles; better-targeted segmentation; data-driven marketing decisions","businessArea":"Marketing","impact":3,"effort":3,"reach":2,"confidence":2,"strategicFit":2,"timeToValue":2,"priorityScore":16,"progress":"Ideation","financialType":"Cost Saving","quadrant":"Reconsider","pillar":"Low Hanging Fruit"},{"category":"Customer Service","title":"Client-Facing Chatbot (Voice Flow)","users":"Bellrock client services teams; pilot client end-users","problem":"Inbound client queries currently absorb significant manual time across webchat, phone and email. No production-grade chatbot exists today for client-facing service requests grounded in client-supplied content.","solution":"Voice Flow-based client-facing chatbot, grounded in Bellrock and client-supplied content. Web + phone channels. Demo built on $1 trial credit (~60% consumed by one webchat + phone call). Production proposal being written. Rohan Anand owning the build.","submitter":"Rohan Anand + Sam Perryman (BD interest)","kpi":"First revenue-generating chatbot product in market; deflect routine queries; faster initial response; baseline for client-bespoke chatbot offering","businessArea":"Cross-Business","impact":3,"effort":3,"reach":3,"confidence":2,"strategicFit":3,"timeToValue":2,"priorityScore":36,"progress":"Scoping","financialType":"Revenue Generating","quadrant":"Reconsider","pillar":"Low Hanging Fruit"},{"category":"Compliance & Quality","title":"Redaction (PII) Project","users":"Bellrock data handlers; compliance team; client-facing teams handling sensitive docs","problem":"Manual PII redaction across uploaded documents is slow, inconsistent and exposes Bellrock to data-leak / compliance risk. No automated tool today.","solution":"Automated PII detection + redaction across documents, fronted by a Bellrock AI web app UI. Three PII types identified; Bellrock-specific 4th type to be confirmed with Cameron. Researched Relativity and competitors. Peter Mellen owning the build.","submitter":"Peter Mellen + Cameron","kpi":"Reduces compliance risk around PII handling; faster, more consistent redaction across the business; potential client-facing offering","businessArea":"Cross-Business","impact":3,"effort":3,"reach":4,"confidence":3,"strategicFit":3,"timeToValue":2,"priorityScore":72,"progress":"In Progress","financialType":"Cost Avoidance","quadrant":"Major Bet","pillar":"Big Wins"},{"category":"Productivity & Knowledge","title":"Teams Transcripts Initiative (Andrew/Josh)","users":"TBD -- pending rescope (small AI project vs larger programme)","problem":"Andrew and Josh have raised a Teams transcript / action-capture initiative. Scope shape is unclear -- could be a small targeted AI project or a larger programme replacing prior shelved Note Taker effort.","solution":"Awaiting rescope. Depending on outcome: either a targeted team-level transcript/action-capture build (small AI project) or a broader programme reactivation (larger programme). Peter Mellen owning until size is determined.","submitter":"Andrew + Josh + Peter Mellen","kpi":"Captures meeting context and follow-ups; reduces note-taking burden; could unlock cross-team action visibility depending on scope","businessArea":"Cross-Business","impact":3,"effort":3,"reach":4,"confidence":2,"strategicFit":2,"timeToValue":2,"priorityScore":32,"progress":"Scoping","financialType":"Cost Saving","quadrant":"Reconsider","pillar":"Low Hanging Fruit"},{"category":"Productivity & Knowledge","title":"Bellrock AI Newsletter","users":"All Bellrock staff","problem":"AI literacy is uneven across the business. No single channel for surfacing wins, new tools, how-to tips and programme progress.","solution":"Monthly internal newsletter summarising AI programme progress, live tools, wins, and how-to tips. First issue published Friday 9 May -- strong reception. Going monthly. Mercy Kanyi running the cadence.","submitter":"Mercy Kanyi + Rich Merrett","kpi":"Drives AI literacy and visibility across the business; lifts the AI waterline; surfaces grad work cross-functionally","businessArea":"Cross-Business","impact":2,"effort":1,"reach":5,"confidence":3,"strategicFit":2,"timeToValue":3,"priorityScore":180,"progress":"Live","financialType":"Cost Saving","quadrant":"Quick Win","pillar":"DIY Wins"}];
+
+const progressColors = {"Live":"#10b981","Test":"#3b82f6","In Progress":"#f59e0b","In Use":"#8b5cf6","Planning":"#06b6d4","Scoping":"#ec4899","Ideation":"#94a3b8","On Hold":"#64748b","Shelved":"#64748b","Blocked":"#ef4444"};
+const quadrantColors = {"Quick Win":"#10b981","Major Bet":"#3b82f6","Fill-in":"#f59e0b","Reconsider":"#94a3b8"};
+const pillarMeta = {
+  "DIY Wins":{icon:"\u26A1",color:"#7fb39a",desc:"Low-effort, high-value initiatives that can be self-served by teams with AI Champions and GPT tools."},
+  "Big Wins":{icon:"\u{1F3AF}",color:"#2563eb",desc:"Large transformation projects co-led by AI Engineering Lead and external agency. 2 major projects per 6 months."},
+  "Low Hanging Fruit":{icon:"\u{1F34A}",color:"#f59e0b",desc:"Smaller initiatives with moderate effort — continuous pipeline of efficiency-driven wins."}
+};
+const allPillars = ["DIY Wins","Big Wins","Low Hanging Fruit"];
+const allProgress = ["Live","In Use","Test","In Progress","Scoping","Planning","On Hold","Ideation","Shelved","Blocked"];
+
+// Computed
+const allAreas = [...new Set(DATA.map(d=>d.businessArea))].sort();
+let currentView = "strategy";
+let currentSearch = "";
+let currentArea = "All";
+let currentProgress = "All";
+let currentPillar = "All";
+let currentFinancial = "All";
+
+// Populate filter dropdowns
+const areaSelect = document.getElementById("filterArea");
+allAreas.forEach(a=>{const o=document.createElement("option");o.value=a;o.textContent=a;areaSelect.appendChild(o);});
+const progSelect = document.getElementById("filterProgress");
+allProgress.forEach(p=>{const o=document.createElement("option");o.value=p;o.textContent=p;progSelect.appendChild(o);});
+const pillarSelect = document.getElementById("filterPillar");
+allPillars.forEach(p=>{const o=document.createElement("option");o.value=p;o.textContent=p;pillarSelect.appendChild(o);});
+
+// Stats
+const totalCount = DATA.length;
+const liveCount = DATA.filter(d=>["Live","In Use","Test"].includes(d.progress)).length;
+const flightCount = DATA.filter(d=>["In Progress","Scoping","Planning"].includes(d.progress)).length;
+const avgScore = Math.round(DATA.reduce((s,d)=>s+d.priorityScore,0)/DATA.length);
+const topScore = Math.round(Math.max(...DATA.map(d=>d.priorityScore)));
+
+document.getElementById("headerSubtitle").textContent = `${totalCount} ideas \u00B7 ${liveCount} live \u00B7 ${flightCount} in flight \u00B7 May 2026`;
+document.getElementById("statsBar").innerHTML = [
+  {l:"Total Ideas",v:totalCount,c:"#fff"},{l:"Live / In Use",v:liveCount,c:"#10b981"},{l:"In Flight",v:flightCount,c:"#f59e0b"},{l:"Avg Score",v:avgScore,c:"#3b82f6"},{l:"Top Score",v:topScore,c:"#8b5cf6"}
+].map(s=>`<div class="stat-item"><div class="stat-val" style="color:${s.c}">${s.v}</div><div class="stat-label">${s.l}</div></div>`).join("");
+
+// Filter logic
+function getFiltered(){
+  return DATA.filter(d=>{
+    if(currentSearch){const q=currentSearch.toLowerCase();if(!d.title.toLowerCase().includes(q)&&!d.problem.toLowerCase().includes(q)&&!d.category.toLowerCase().includes(q))return false;}
+    if(currentArea!=="All"&&d.businessArea!==currentArea)return false;
+    if(currentProgress!=="All"&&d.progress!==currentProgress)return false;
+    if(currentPillar!=="All"&&d.pillar!==currentPillar)return false;
+    if(currentFinancial!=="All"&&(d.financialType||"Cost Saving")!==currentFinancial)return false;
+    return true;
+  });
+}
+
+function getByPillar(filtered){
+  const m={};allPillars.forEach(p=>m[p]=[]);
+  filtered.forEach(d=>{if(m[d.pillar])m[d.pillar].push(d);});
+  return m;
+}
+
+// Financial Type pill helper
+function ftPill(ft){
+  const cls = ft==="Revenue Generating" ? "ft-rg" : ft==="Cost Avoidance" ? "ft-ca" : "ft-cs";
+  const label = ft==="Revenue Generating" ? "Revenue" : ft==="Cost Avoidance" ? "Cost Avoid." : "Cost Save";
+  return `<span class="ft-pill ${cls}" title="${ft}">${label}</span>`;
+}
+
+// Card HTML
+function cardHTML(uc){
+  const impW=(uc.impact/5)*100;
+  const effW=(uc.effort/5)*100;
+  const ft = uc.financialType || "Cost Saving";
+  return `<div class="uc-card" onclick="openModal('${uc.title.replace(/'/g,"\\'")}')">
+    <div class="uc-card-top">
+      <div class="uc-card-title">${uc.title}</div>
+      <span class="uc-badge" style="background:${progressColors[uc.progress]||'#94a3b8'}">${uc.progress}</span>
+    </div>
+    <p class="uc-card-problem">${uc.problem}</p>
+    <div class="uc-card-bottom">
+      <div class="uc-card-scores">
+        <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:${impW}%;background:#10b981"></div></div><span class="score-bar-val">${uc.impact}</span></div>
+        <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:${effW}%;background:#ef4444"></div></div><span class="score-bar-val">${uc.effort}</span></div>
+      </div>
+      <span class="uc-card-score">${Math.round(uc.priorityScore)}</span>
+    </div>
+    <div class="uc-card-tags">${ftPill(ft)}<span class="uc-tag">${uc.businessArea}</span><span class="uc-tag">${uc.category}</span></div>
+  </div>`;
+}
+
+// Pillar card
+function pillarCardHTML(name, items){
+  const m=pillarMeta[name];
+  const sorted=[...items].sort((a,b)=>b.priorityScore-a.priorityScore);
+  const live=items.filter(i=>["Live","In Use","Test"].includes(i.progress)).length;
+  const inf=items.filter(i=>["In Progress","Scoping","Planning"].includes(i.progress)).length;
+  let html=`<div class="pillar-card"><div class="pillar-card-header" style="background:${m.color}">
+    <div class="pillar-icon">${m.icon}</div><h3>${name}</h3>
+    <div class="pillar-desc">${m.desc}</div>
+    <div class="pillar-card-stats"><span class="pcs-val">${items.length}</span><div class="pcs-detail"><div>${live} live/in use</div><div>${inf} in flight</div></div></div>
+  </div><div class="pillar-card-body">`;
+  sorted.slice(0,8).forEach(uc=>{html+=cardHTML(uc);});
+  if(sorted.length>8) html+=`<div class="pillar-more">+${sorted.length-8} more ideas</div>`;
+  html+=`</div></div>`;
+  return html;
+}
+
+// Modal
+function openModal(title){
+  const uc=DATA.find(d=>d.title===title);
+  if(!uc)return;
+  const scores=[
+    {l:"Impact",v:uc.impact,c:"#10b981"},{l:"Effort",v:uc.effort,c:"#ef4444"},{l:"Reach",v:uc.reach,c:"#3b82f6"},
+    {l:"Confidence",v:uc.confidence,c:"#8b5cf6"},{l:"Strategic Fit",v:uc.strategicFit,c:"#f59e0b"},{l:"Time to Value",v:uc.timeToValue,c:"#06b6d4"}
+  ];
+  document.getElementById("modalContent").innerHTML=`
+    <div class="modal-header" style="background:#0d5c5c">
+      <div class="modal-header-top">
+        <div><span class="modal-category">${uc.category}</span><h2 class="modal-title">${uc.title}</h2></div>
+        <button class="modal-close" onclick="closeModal()">\u2715</button>
+      </div>
+      <div class="modal-badges">
+        <span class="modal-badge" style="background:${progressColors[uc.progress]}">${uc.progress}</span>
+        <span class="modal-badge" style="background:${quadrantColors[uc.quadrant]}">${uc.quadrant}</span>
+        <span class="modal-badge" style="background:rgba(255,255,255,0.2)">${uc.businessArea}</span>
+        <span class="modal-badge" style="background:${uc.financialType==='Revenue Generating'?'#10b981':uc.financialType==='Cost Avoidance'?'#d97706':'#3b82f6'}">${uc.financialType||'Cost Saving'}</span>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-section"><div class="modal-section-label">Problem</div><p class="modal-section-text">${uc.problem}</p></div>
+      <div class="modal-section"><div class="modal-section-label">Solution</div><p class="modal-section-text">${uc.solution}</p></div>
+      <div class="modal-section"><div class="modal-section-label">KPI / Expected Outcome</div><p class="modal-kpi">${uc.kpi}</p></div>
+      <div class="modal-info-grid">
+        <div class="modal-info-box"><div class="mib-label">Users Impacted</div><div class="mib-val">${uc.users}</div></div>
+        <div class="modal-info-box"><div class="mib-label">Submitted By</div><div class="mib-val">${uc.submitter}</div></div>
+      </div>
+      <div class="modal-scores">
+        ${scores.map(s=>`<div class="modal-score-box"><div class="msb-val" style="color:${s.c}">${s.v}</div><div class="msb-label">${s.l}</div></div>`).join("")}
+        <div class="modal-score-box modal-score-total"><div class="msb-val">${Math.round(uc.priorityScore)}</div><div class="msb-label">Priority</div></div>
+      </div>
+    </div>`;
+  document.getElementById("modalOverlay").classList.add("open");
+}
+function closeModal(){document.getElementById("modalOverlay").classList.remove("open");}
+document.getElementById("modalOverlay").addEventListener("click",function(e){if(e.target===this)closeModal();});
+
+// Render
+function render(){
+  const filtered=getFiltered();
+  document.getElementById("filterCount").textContent=filtered.length+" results";
+
+  // Strategy view: pillar stats + pillar grid
+  const bp=getByPillar(filtered);
+  document.getElementById("pillarStats").innerHTML=[
+    {n:"Big Wins",c:bp["Big Wins"]?.length||0,bg:"#2563eb"},
+    {n:"DIY Wins",c:bp["DIY Wins"]?.length||0,bg:"#7fb39a"},
+    {n:"Low Hanging Fruit",c:bp["Low Hanging Fruit"]?.length||0,bg:"#f59e0b"}
+  ].map(p=>`<div class="pillar-stat" style="background:${p.bg}" onclick="document.getElementById('filterPillar').value='${p.n}';currentPillar='${p.n}';switchView('pipeline');render();">
+    <div class="ps-val">${p.c}</div><div class="ps-label">${p.n}</div></div>`).join("");
+
+  document.getElementById("pillarGrid").innerHTML=allPillars.map(p=>pillarCardHTML(p,bp[p]||[])).join("");
+
+  // Pipeline
+  const sorted=[...filtered].sort((a,b)=>b.priorityScore-a.priorityScore);
+  if(sorted.length===0){
+    document.getElementById("pipelineGrid").innerHTML=`<div class="pipeline-empty"><div class="pipeline-empty-icon">\u{1F50D}</div><p>No ideas match your filters</p></div>`;
+  } else {
+    document.getElementById("pipelineGrid").innerHTML=sorted.map(uc=>cardHTML(uc)).join("");
+  }
+
+  // Matrix
+  const plot=document.getElementById("matrixPlot");
+  plot.querySelectorAll(".matrix-dot").forEach(d=>d.remove());
+  filtered.forEach((uc,i)=>{
+    const x=((uc.effort-0.5)/5)*90+5;
+    const y=95-((uc.impact-0.5)/5)*90;
+    const size=Math.max(8,Math.min(30,uc.priorityScore/10));
+    const jx=(i%7-3)*1.2;
+    const jy=(i%5-2)*1.2;
+    const dot=document.createElement("div");
+    dot.className="matrix-dot";
+    dot.style.cssText=`left:${x+jx}%;top:${y+jy}%;width:${size}px;height:${size}px;background:${quadrantColors[uc.quadrant]}`;
+    dot.title=uc.title+"\nScore: "+Math.round(uc.priorityScore);
+    dot.onclick=()=>openModal(uc.title);
+    plot.appendChild(dot);
+  });
+}
+
+// View switching
+function switchView(v){
+  currentView=v;
+  document.querySelectorAll(".view-section").forEach(s=>s.classList.remove("active"));
+  document.getElementById("view"+v.charAt(0).toUpperCase()+v.slice(1)).classList.add("active");
+  document.querySelectorAll(".nav-tab").forEach(t=>{t.classList.toggle("active",t.dataset.view===v);});
+}
+document.querySelectorAll(".nav-tab").forEach(t=>{t.addEventListener("click",()=>{switchView(t.dataset.view);});});
+
+// Filter events
+document.getElementById("searchInput").addEventListener("input",function(){currentSearch=this.value;render();});
+document.getElementById("filterArea").addEventListener("change",function(){currentArea=this.value;render();});
+document.getElementById("filterProgress").addEventListener("change",function(){currentProgress=this.value;render();});
+document.getElementById("filterPillar").addEventListener("change",function(){currentPillar=this.value;render();});
+document.getElementById("filterFinancial").addEventListener("change",function(){currentFinancial=this.value;render();});
+
+// === AI Workforce Tools Calculator ===
+const calcTools = [
+  { id:"copilot", name:"Microsoft 365 Copilot", price:25, desc:"AI assistant across Word, Excel, PowerPoint, Outlook and Teams. Ideal for broad rollout to all knowledge workers.", tag:"Productivity", tagColor:"#3b82f6", users:0 },
+  { id:"teams-prem", name:"Teams Premium", price:7, desc:"AI-powered meeting recaps, live translations, and intelligent meeting features. Low cost, high reach.", tag:"Meetings", tagColor:"#8b5cf6", users:0 },
+  { id:"chatgpt", name:"ChatGPT Team", price:25, desc:"OpenAI's ChatGPT with team workspace, GPT builder and advanced reasoning. For power users and AI Champions.", tag:"General AI", tagColor:"#10b981", users:0 },
+  { id:"claude", name:"Claude Pro", price:20, desc:"Anthropic's Claude with extended context, Projects and deep analysis. For research-heavy roles and complex document work.", tag:"General AI", tagColor:"#10b981", users:0 },
+];
+let calcNextId = 1;
+
+function addCustomTool(){
+  const name = prompt("Tool name:");
+  if(!name) return;
+  const price = parseFloat(prompt("Monthly cost per user (£):","0"));
+  if(isNaN(price)) return;
+  const desc = prompt("Short description (optional):","");
+  calcTools.push({ id:"custom-"+calcNextId++, name:name, price:price, desc:desc||"Custom tool added manually.", tag:"Custom", tagColor:"#94a3b8", users:0, removable:true });
+  renderCalc();
+}
+
+function renderCalc(){
+  const grid=document.getElementById("calcGrid");
+  grid.innerHTML=calcTools.map(t=>{
+    const sub=t.price*t.users;
+    const annual=sub*12;
+    return `<div class="calc-tool-card ${t.users>0?'active':''}">
+      <div class="calc-tool-top">
+        <div class="calc-tool-name">${t.name}</div>
+        <span class="calc-tool-tag" style="background:${t.tagColor}20;color:${t.tagColor}">${t.tag}</span>
+      </div>
+      <div class="calc-tool-desc">${t.desc}</div>
+      ${t.removable?`<div class="calc-tool-input" style="margin-bottom:8px"><label>&pound;/user/mo</label><input type="number" min="0" value="${t.price}" onchange="calcTools.find(x=>x.id==='${t.id}').price=+this.value;renderCalc();" style="width:70px"></div>`
+        :`<div class="calc-tool-price">&pound;${t.price} / user / month</div>`}
+      <div class="calc-tool-input">
+        <label>Users:</label>
+        <input type="number" min="0" max="10000" value="${t.users}" onchange="calcTools.find(x=>x.id==='${t.id}').users=Math.max(0,+this.value);renderCalc();">
+      </div>
+      ${t.users>0?`<div class="calc-tool-subtotal">&pound;${sub.toLocaleString()} /mo &middot; &pound;${annual.toLocaleString()} /yr</div>`:''}
+      ${t.removable?`<div style="margin-top:10px;text-align:right"><button onclick="calcTools.splice(calcTools.findIndex(x=>x.id==='${t.id}'),1);renderCalc();" style="background:none;border:none;color:#ef4444;font-size:11px;cursor:pointer;font-weight:600;font-family:inherit">&times; Remove</button></div>`:''}
+    </div>`;
+  }).join("")
+  + `<div class="calc-tool-card" onclick="addCustomTool()" style="cursor:pointer;display:flex;align-items:center;justify-content:center;flex-direction:column;min-height:180px;border-style:dashed;color:#94a3b8">
+      <div style="font-size:32px;margin-bottom:8px">+</div>
+      <div style="font-size:13px;font-weight:700">Add Tool</div>
+      <div style="font-size:11px;margin-top:4px">Click to add a custom licence</div>
+    </div>`;
+
+  const totalUsers=calcTools.reduce((s,t)=>s+t.users,0);
+  const totalMonthly=calcTools.reduce((s,t)=>s+(t.price*t.users),0);
+  const totalAnnual=totalMonthly*12;
+  const toolsInUse=calcTools.filter(t=>t.users>0).length;
+  const avgPerUser=totalUsers>0?Math.round(totalMonthly/totalUsers*100)/100:0;
+
+  document.getElementById("calcSummary").innerHTML=`
+    <div class="calc-summary-grid">
+      <div class="calc-summary-item"><div class="csi-val">${toolsInUse}</div><div class="csi-label">Tools Selected</div></div>
+      <div class="calc-summary-item"><div class="csi-val">${totalUsers.toLocaleString()}</div><div class="csi-label">Total Licences</div></div>
+      <div class="calc-summary-item"><div class="csi-val">&pound;${totalMonthly.toLocaleString()}</div><div class="csi-label">Monthly Cost</div></div>
+      <div class="calc-summary-item"><div class="csi-val">&pound;${totalAnnual.toLocaleString()}</div><div class="csi-label">Annual Cost</div></div>
+      <div class="calc-summary-item"><div class="csi-val">&pound;${avgPerUser}</div><div class="csi-label">Avg / User / Mo</div></div>
+    </div>`;
+}
+renderCalc();
+
+
+// === Current Progress (project-by-project, ownership tag) ===
+const PROGRESS_DATA = [
+  {
+    title: "Survey Data Capture",
+    owner: "Mir",
+    ownerColor: "#0d5c5c",
+    status: "DEMO",
+    statusColor: "#8b5cf6",
+    headerColor: "#0d5c5c",
+    summary: "Helmet/phone camera + AI vision auto-identifies assets in a room against an NRM3 / Uniclass taxonomy. Builds on Rohan's element ID prototype.",
+    workstream: "Demo ready &mdash; shown to Oliver Tuesday 6 May, well-received. Aaron Harris (MNE Surveyor) had built a parallel approach via voice dictation &rarr; OneNote &rarr; ChatGPT. Joint demo + workshop held 14 May with Ben, Luke and Aaron. Aaron's prompt being folded into Mir's build.",
+    nextMilestone: "Live in-office demo with Ben + Luke; document the combined Mir + Aaron approach; agree pilot pathway with Surveying SLT.",
+    blockers: "None &mdash; documentation in progress for both Survey Data Capture and Certificate Check.",
+    impact: "Replace bulk of manual surveying time at scale (1700-survey IAC commitment by July 2027)."
+  },
+  {
+    title: "Certificate Check",
+    owner: "Mir",
+    ownerColor: "#0d5c5c",
+    status: "BUILD",
+    statusColor: "#3b82f6",
+    headerColor: "#0d5c5c",
+    summary: "AI compliance check across certification documents. Validates against ruleset, flags missing/expired/non-compliant items and proposes pass/fail with rationale.",
+    workstream: "Blocker to get access to the Concerto API has been removed. Now working on pulling live data from Concerto to run a wider accuracy test across specific certificate types.",
+    nextMilestone: "Run accuracy test against live Concerto certificate data; publish per-cert-type accuracy metrics.",
+    blockers: "None remaining &mdash; Concerto API access now in place.",
+    impact: "Cuts inconsistent pass/fail decisions across the compliance estate; reduces missed breaches and rework."
+  },
+  {
+    title: "Building Condition Survey Writer (SurveAI)",
+    owner: "Rohan",
+    ownerColor: "#1a3a3a",
+    status: "DEMO",
+    statusColor: "#8b5cf6",
+    headerColor: "#1a3a3a",
+    summary: "Multi-stage AI pipeline for building condition survey reports. GPT drafts narratives and ratings using template structure and surveyor input.",
+    workstream: "70-80% functional. Sample report generated from real survey images. Removed colour-rating output (Dan Wise impressed). Ready for demo &mdash; waiting on William to deploy on Bellrock AI portal.",
+    nextMilestone: "AI portal deployment by William; surveyor walkthrough; live pilot on Central region surveys.",
+    blockers: "Deployment slot on Bellrock AI portal.",
+    impact: "Halves report drafting time for Building Surveyors; consistent narrative and ratings across reports."
+  },
+  {
+    title: "Client-Facing Chatbot",
+    owner: "Rohan",
+    ownerColor: "#1a3a3a",
+    status: "SCOPE",
+    statusColor: "#c47e00",
+    headerColor: "#1a3a3a",
+    summary: "Production-ready Voice Flow chatbot for inbound client queries (webchat + phone), grounded in Bellrock-supplied content.",
+    workstream: "Voice Flow demo done with $1 trial credit (~60% used by one webchat + phone call). Building proposal for production use.",
+    nextMilestone: "Production-cost proposal; pilot scoping; line up first client deployment.",
+    blockers: "Awaiting sign-off on production-cost commercial model.",
+    impact: "Deflects routine queries; first revenue-generating chatbot product in market."
+  },
+  {
+    title: "Redaction (PII) Project",
+    owner: "Peter",
+    ownerColor: "#0e6b6b",
+    status: "BUILD",
+    statusColor: "#3b82f6",
+    headerColor: "#0e6b6b",
+    summary: "Automated detection and redaction of PII across uploaded documents. Built on Bellrock AI web app front-end.",
+    workstream: "Scope + comprehensive proposal documentation complete &mdash; researched Relativity and competitors. Three PII types identified; Bellrock-specific 4th type to be confirmed with Cameron. Front-end started on Bellrock AI web app.",
+    nextMilestone: "Confirm 4th Bellrock-specific PII type with Cameron; finish front-end on AI web app; first round of redaction accuracy tests.",
+    blockers: "None &mdash; pending Cameron confirmation on 4th type.",
+    impact: "Reduces compliance risk around PII handling; faster, more consistent redaction across the business."
+  },
+  {
+    title: "Timesheet Intelligence Project",
+    owner: "Peter",
+    ownerColor: "#0e6b6b",
+    status: "HOLD",
+    statusColor: "#94a3b8",
+    headerColor: "#0e6b6b",
+    summary: "Telematics + scheduled job data + AI matching to build accurate engineer / driver timesheets and surface anomalies. Integration via Epics API.",
+    workstream: "Awaiting Epics May release (imminent). All groundwork done &mdash; will wire in as soon as endpoints ship.",
+    nextMilestone: "Epics May release lands; wire endpoints into prototype; sample reconciliation run against pilot engineer cohort.",
+    blockers: "Dependent on the Epics May release shipping.",
+    impact: "Reduces payroll queries; improves timesheet accuracy; recovers lost engineer time across Jordon."
+  },
+  {
+    title: "Teams Transcripts (Andrew / Josh)",
+    owner: "Peter",
+    ownerColor: "#0e6b6b",
+    status: "SCOPE",
+    statusColor: "#c47e00",
+    headerColor: "#0e6b6b",
+    summary: "Captures Teams meeting transcripts and surfaces actions, decisions and follow-ups across the business.",
+    workstream: "Awaiting rescope to see whether this is a small AI project or something larger.",
+    nextMilestone: "Rescope meeting with Andrew + Josh; agree size and shape; assign delivery path.",
+    blockers: "Awaiting rescope decision.",
+    impact: "If large: AI Meeting Note Taker rollout pattern across all staff. If small: targeted action-capture for a specific team."
+  },
+  {
+    title: "Worksheet Processor (Jordon)",
+    owner: "Mercy",
+    ownerColor: "#7fb39a",
+    status: "BUILD",
+    statusColor: "#3b82f6",
+    headerColor: "#7fb39a",
+    summary: "Azure Document Intelligence pipeline classifying and extracting data from subcontractor worksheets into Jordon format.",
+    workstream: "Code review with William last week. Storage layer being built into the AI portal platform. Meeting William 10.30 today to progress.",
+    nextMilestone: "Storage layer completion; first end-to-end run on real worksheet batch; accuracy review.",
+    blockers: "None &mdash; on track.",
+    impact: "Reduce manual transposition from 25&ndash;40 hrs/week to 2 hrs/week across the Jordon service team."
+  },
+  {
+    title: "CSEC Call Analysis Dashboard",
+    owner: "Mercy",
+    ownerColor: "#7fb39a",
+    status: "DEMO",
+    statusColor: "#8b5cf6",
+    headerColor: "#7fb39a",
+    summary: "AI sentiment + adherence checking across inbound calls, with per-evaluator priorities (sentiment library, knowledge base).",
+    workstream: "Dashboard restructured around CSEC evaluator priorities. Demo with CSEC team this week pending bug fix on data presentation.",
+    nextMilestone: "CSEC team demo this week; bug fix on data presentation; feedback loop into QA library.",
+    blockers: "Open bug on data presentation.",
+    impact: "Lift QA coverage from sample to 100% across CSEC; surface low-scoring interactions for coaching."
+  },
+  {
+    title: "Bellrock AI Newsletter",
+    owner: "Mercy",
+    ownerColor: "#7fb39a",
+    status: "LIVE",
+    statusColor: "#10b981",
+    headerColor: "#7fb39a",
+    summary: "Monthly internal newsletter summarising AI progress, wins and how-to tips for the whole business.",
+    workstream: "First issue published Friday 9 May. Strong reception across the business. Going monthly.",
+    nextMilestone: "Issue #2 in early June; build a regular content pipeline; light analytics on open rates.",
+    blockers: "None &mdash; live.",
+    impact: "Drives AI literacy and visibility across the business; lifts the AI waterline."
+  },
+  {
+    title: "AI Avatar Training",
+    owner: "Mercy",
+    ownerColor: "#7fb39a",
+    status: "SCOPE",
+    statusColor: "#c47e00",
+    headerColor: "#7fb39a",
+    summary: "Investigating whether AI Avatars (HeyGen / Synthesia) can be used to deliver Concerto training to internal staff and clients.",
+    workstream: "From the CSEC hackathon &mdash; investigating whether AI Avatars can be used to deliver Concerto training.",
+    nextMilestone: "Sample avatar-delivered Concerto module; A/B against current training; scope rollout plan.",
+    blockers: "Awaiting first sample build to assess viability.",
+    impact: "Faster training rollout; consistent message at scale; potential client-facing revenue stream."
+  }
+];
+
+function renderProgress(){
+  const grid = document.getElementById("progressGrid");
+  if(!grid) return;
+  grid.innerHTML = PROGRESS_DATA.map(p=>`
+    <div class="detail-card">
+      <div class="detail-card-header" style="background:${p.headerColor}">
+        <div class="dch-eyebrow">${p.owner}</div>
+        <h3>${p.title}</h3>
+        <div class="dch-sub">${p.summary}</div>
+        <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+          <span class="status-pill" style="background:${p.statusColor}">${p.status}</span>
+        </div>
+      </div>
+      <div class="detail-card-body">
+        <div class="detail-row"><div class="dr-label">Owner</div><div class="dr-value">${p.owner}</div></div>
+        <div class="detail-row"><div class="dr-label">Current Workstream</div><div class="dr-value">${p.workstream}</div></div>
+        <div class="detail-row"><div class="dr-label">Next Milestone</div><div class="dr-value">${p.nextMilestone}</div></div>
+        <div class="detail-row"><div class="dr-label">Blockers</div><div class="dr-value">${p.blockers}</div></div>
+        <div class="detail-row"><div class="dr-label">Expected Impact</div><div class="dr-value">${p.impact}</div></div>
+      </div>
+    </div>
+  `).join("");
+}
+
+// === Proposed Next Big Projects (4 contenders) ===
+const PROPOSED_DATA = [
+  {
+    title: "QS Benchmarking Assistant",
+    eyebrow: "Contender 1",
+    headerColor: "#0d5c5c",
+    vfm: "24",
+    vfmNote: "VfM rises sharply with cleansed cost data",
+    financialType: "Revenue Generating",
+    sponsor: "Ben Smith (QS) + David Cronje",
+    delivery: "Strategic firework &mdash; benchmarking layer over 100+ years of Bellrock cost data. GPT queries Bellrock + industry cost data and returns benchmark ranges with rationale.",
+    value: "Faster benchmark response on bids, improved win rate, potential subscription product for clients. Differentiator in commercial conversations.",
+    ask: "Approve the strategic partner engagement for a parallel benchmarking firework alongside Asset Capture."
+  },
+  {
+    title: "Asset Capture (Firework)",
+    eyebrow: "Contender 2",
+    headerColor: "#1a3a3a",
+    vfm: "90",
+    vfmNote: "Major Bet &mdash; high reach, high effort",
+    financialType: "Revenue Generating",
+    sponsor: "Carlo + JJ + Ben Smith",
+    delivery: "Helmet/phone-camera + AI vision auto-identifies assets against NRM3/Uniclass taxonomy. Strategic firework build. Mir running the in-house POC.",
+    value: "Replace bulk of manual surveying time at scale (1700-survey IAC client commitment by July 2027). Strategic differentiator for Consulting.",
+    ask: "Confirm scope &amp; budget for the second strategic firework &mdash; running in parallel to QS Benchmarking."
+  },
+  {
+    title: "Lens Invoice Validation",
+    eyebrow: "Contender 3",
+    headerColor: "#0e6b6b",
+    vfm: "72",
+    vfmNote: "Quick Win territory &mdash; achievable in-house",
+    financialType: "Cost Avoidance",
+    sponsor: "Finance / Lens Project",
+    delivery: "Validation layer against incoming invoices via the Lens platform &mdash; flags discrepancies, mismatched PO/contract refs, duplicates, before payment.",
+    value: "Direct cost avoidance &mdash; eliminates over-payment risk and supplier dispute cycles. Cleaner audit trail for Finance.",
+    ask: "Backing to run as next DIY Wins flagship &mdash; Mercy / Peter to deliver in-house."
+  },
+  {
+    title: "Proactive Supplier Chasing",
+    eyebrow: "Contender 4",
+    headerColor: "#7fb39a",
+    vfm: "90",
+    vfmNote: "Major Bet &mdash; firework candidate",
+    financialType: "Cost Saving",
+    sponsor: "Carlo + James + CE Operations",
+    delivery: "Multi-stage automated reminders to suppliers, three-strikes escalation, dashboards for Ops. Firework candidate or strategic build alongside Auto Status Updates.",
+    value: "Cut manual supplier-chasing volume (thousands of PPMs/week chased manually today); recover CE FTE; lift SLA hit rate.",
+    ask: "Sign-off whether to scope as third firework or in-house build alongside PVR Automation."
+  }
+];
+
+function renderProposed(){
+  const grid = document.getElementById("proposedGrid");
+  if(!grid) return;
+  grid.innerHTML = PROPOSED_DATA.map(p=>{
+    const ftCls = p.financialType==="Revenue Generating" ? "ft-rg" : p.financialType==="Cost Avoidance" ? "ft-ca" : "ft-cs";
+    return `
+    <div class="detail-card">
+      <div class="detail-card-header" style="background:${p.headerColor}">
+        <div class="dch-eyebrow">${p.eyebrow}</div>
+        <h3>${p.title}</h3>
+        <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+          <span class="status-pill" style="background:rgba(255,255,255,0.18)">VfM ${p.vfm}</span>
+          <span class="status-pill ${ftCls}">${p.financialType}</span>
+        </div>
+      </div>
+      <div class="detail-card-body">
+        <div class="detail-row"><div class="dr-label">Sponsor</div><div class="dr-value">${p.sponsor}</div></div>
+        <div class="detail-row"><div class="dr-label">Delivery Approach</div><div class="dr-value">${p.delivery}</div></div>
+        <div class="detail-row"><div class="dr-label">Value</div><div class="dr-value">${p.value}</div></div>
+        <div class="detail-row"><div class="dr-label">VfM Note</div><div class="dr-value">${p.vfmNote}</div></div>
+        <div class="ask-box"><div class="ask-label">Ask from Carlo</div>${p.ask}</div>
+      </div>
+    </div>
+  `;}).join("");
+}
+
+
+renderProgress();
+renderProposed();
+
+// Initial render
+render();
+</script>
+</body>
+</html>
