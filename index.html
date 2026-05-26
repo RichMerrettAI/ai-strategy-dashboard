@@ -189,6 +189,12 @@ body {
 .tools-ribbon-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--lichen); font-weight: 700; margin-bottom: 4px; }
 .tools-ribbon-body { font-size: 12px; line-height: 1.5; }
 
+/* Progress card business-area tag */
+.dch-area-tag { display: inline-block; font-size: 9px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; background: rgba(255,255,255,0.22); color: #fff; border: 1px solid rgba(255,255,255,0.4); margin-right: 6px; }
+.progress-section-sub-title { font-size: 13px; font-weight: 700; color: var(--fir); margin: 26px 0 8px; padding-top: 18px; border-top: 1px solid #e2e8f0; letter-spacing: -0.1px; }
+.progress-section-sub-title .progress-section-count { display: inline-block; font-size: 11px; color: #fff; background: var(--pine); padding: 2px 8px; border-radius: 999px; margin-left: 8px; vertical-align: middle; }
+.progress-section-sub-sub { font-size: 12px; color: #64748b; margin: 0 0 14px; line-height: 1.45; }
+
 /* Power Users panel */
 .power-users-panel { background: #fff; border-radius: 14px; border: 1px solid #e2e8f0; padding: 20px 24px 22px; margin-bottom: 18px; }
 .pu-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 10px; margin-bottom: 4px; }
@@ -485,9 +491,13 @@ body {
 
   <!-- CURRENT PROGRESS VIEW -->
   <div class="view-section" id="viewProgress">
-    <h2 class="cp-section-title">AI Team &mdash; Current Workstreams</h2>
-    <p class="cp-section-sub">What each AI graduate is delivering right now. Status reflects their latest weekly catch-up (week ending 13 May 2026).</p>
+    <h2 class="cp-section-title">AI Team &mdash; Actively in build</h2>
+    <p class="cp-section-sub">What each AI graduate is actively delivering right now &mdash; in build, in demo, or live. Latest status from the AI Team weekly catch-up and CSEC governance call &mdash; 26 May 2026.</p>
     <div class="detail-grid" id="progressGrid"></div>
+
+    <h3 class="progress-section-sub-title">In discovery / in discussion <span class="progress-section-count" id="discoveryCount">0</span></h3>
+    <p class="progress-section-sub-sub">Workstreams we are scoping, researching or socialising with the business &mdash; not yet active build, but on the radar and being talked about.</p>
+    <div class="detail-grid" id="discoveryGrid"></div>
   </div>
 
   <!-- PROPOSED PROJECTS VIEW -->
@@ -792,6 +802,8 @@ const PROGRESS_DATA = [
     status: "DEMO",
     statusColor: "#8b5cf6",
     headerColor: "#0d5c5c",
+    phase: "active",
+    businessArea: "IAC",
     summary: "Helmet/phone camera + AI vision auto-identifies assets in a room against an NRM3 / Uniclass taxonomy. Builds on Rohan's element ID prototype.",
     workstream: "Demo ready &mdash; shown to Oliver Tuesday 6 May, well-received. Aaron Harris (MNE Surveyor) had built a parallel approach via voice dictation &rarr; OneNote &rarr; ChatGPT. Joint demo + workshop held 14 May with Ben, Luke and Aaron. Aaron's prompt being folded into Mir's build.",
     nextMilestone: "Live in-office demo with Ben + Luke; document the combined Mir + Aaron approach; agree pilot pathway with Surveying SLT.",
@@ -802,9 +814,11 @@ const PROGRESS_DATA = [
     title: "Certificate Check",
     owner: "Mir",
     ownerColor: "#0d5c5c",
-    status: "BUILD",
-    statusColor: "#3b82f6",
+    status: "BLOCK",
+    statusColor: "#dc2626",
     headerColor: "#0d5c5c",
+    phase: "active",
+    businessArea: "CSEC",
     summary: "AI compliance check across certification documents. Validates against ruleset, flags missing/expired/non-compliant items and proposes pass/fail with rationale.",
     workstream: "Two Concerto Hub connectivity routes identified; Peter has written groundwork into the GitHub repo so we can test the moment the API token + test environment arrive. Still chasing Dan (sent another e-mail this morning) for the access pack. Mir is off this week so picks up next week regardless. Highlighted to Carlo for Thursday's AI steer co.",
     nextMilestone: "Sit-down with Dan in-room to unblock auth token + test environment; then run wider accuracy test against live Concerto certificate data.",
@@ -818,24 +832,13 @@ const PROGRESS_DATA = [
     status: "DEMO",
     statusColor: "#8b5cf6",
     headerColor: "#1a3a3a",
+    phase: "active",
+    businessArea: "Consulting",
     summary: "Multi-stage AI pipeline for building condition survey reports. GPT drafts narratives and ratings using template structure and surveyor input.",
     workstream: "70-80% functional. Sample report generated from real survey images. Removed colour-rating output (Dan Wise impressed). Ready for demo &mdash; waiting on William to deploy on Bellrock AI portal.",
     nextMilestone: "AI portal deployment by William; surveyor walkthrough; live pilot on Central region surveys.",
     blockers: "Deployment slot on Bellrock AI portal.",
     impact: "Halves report drafting time for Building Surveyors; consistent narrative and ratings across reports."
-  },
-  {
-    title: "Client-Facing Chatbot",
-    owner: "Rohan",
-    ownerColor: "#1a3a3a",
-    status: "SCOPE",
-    statusColor: "#c47e00",
-    headerColor: "#1a3a3a",
-    summary: "Production-ready Voice Flow chatbot for inbound client queries (webchat + phone), grounded in Bellrock-supplied content.",
-    workstream: "Voice Flow demo done with $1 trial credit (~60% used by one webchat + phone call). Building proposal for production use.",
-    nextMilestone: "Production-cost proposal; pilot scoping; line up first client deployment.",
-    blockers: "Awaiting sign-off on production-cost commercial model.",
-    impact: "Deflects routine queries; first revenue-generating chatbot product in market."
   },
   {
     title: "Redaction (PII) Project",
@@ -844,6 +847,8 @@ const PROGRESS_DATA = [
     status: "BUILD",
     statusColor: "#3b82f6",
     headerColor: "#0e6b6b",
+    phase: "active",
+    businessArea: "Cross-Business",
     summary: "Automated detection and redaction of PII across uploaded documents. Built on Bellrock AI web app front-end.",
     workstream: "Front-end progressing on Bellrock AI web app. Hit a real wall on signature detection &mdash; current approach only catches signatures that have a box or labelled text near them; squiggle-only signatures slip through. Rich's previous build used AWS Textract at ~94% accuracy. Mercy demonstrated a confirmation-step UI from the Jordon worksheets work that could backstop the AI detection. Need to put a meeting in with Darren to confirm which document types are actually in scope.",
     nextMilestone: "Speak to Phil Bray about AWS account access to trial Textract; meeting with Darren to confirm in-scope documents; review Mercy's confirmation-step pattern.",
@@ -857,24 +862,13 @@ const PROGRESS_DATA = [
     status: "HOLD",
     statusColor: "#94a3b8",
     headerColor: "#0e6b6b",
+    phase: "active",
+    businessArea: "CE",
     summary: "Telematics + scheduled job data + AI matching to build accurate engineer / driver timesheets and surface anomalies. Integration via Epics API.",
     workstream: "Ian confirmed Epics release slipped slightly but is due by end of month. All groundwork done &mdash; will wire in as soon as endpoints ship. Peter chasing Ian today for an exact date.",
     nextMilestone: "Epics release lands by end of May; wire endpoints into prototype; sample reconciliation run against pilot engineer cohort.",
     blockers: "Dependent on Epics shipping the release.",
     impact: "Reduces payroll queries; improves timesheet accuracy; recovers lost engineer time across Jordon."
-  },
-  {
-    title: "Teams Transcripts (Andrew / Josh)",
-    owner: "Peter",
-    ownerColor: "#0e6b6b",
-    status: "SCOPE",
-    statusColor: "#c47e00",
-    headerColor: "#0e6b6b",
-    summary: "Captures Teams meeting transcripts and surfaces actions, decisions and follow-ups across the business.",
-    workstream: "Awaiting rescope to see whether this is a small AI project or something larger.",
-    nextMilestone: "Rescope meeting with Andrew + Josh; agree size and shape; assign delivery path.",
-    blockers: "Awaiting rescope decision.",
-    impact: "If large: AI Meeting Note Taker rollout pattern across all staff. If small: targeted action-capture for a specific team."
   },
   {
     title: "Worksheet Processor (Jordon)",
@@ -883,6 +877,8 @@ const PROGRESS_DATA = [
     status: "BUILD",
     statusColor: "#3b82f6",
     headerColor: "#7fb39a",
+    phase: "active",
+    businessArea: "CE",
     summary: "Azure Document Intelligence pipeline classifying and extracting data from subcontractor worksheets into Jordon format.",
     workstream: "William meeting with Phil Bray this week to settle the storage layer (held up last week by an unrelated storage issue). Demo received well by Jack &mdash; he likes the project. Still need Paul to sign off the running-cost approval on the Jordon side. Costs land in the Digital department's Azure bill so we are working out the cleanest way to charge them back to Jordon.",
     nextMilestone: "Close out storage decision with William + Phil; share business case + slides with Rich for the ROI tracker; first end-to-end run on real worksheet batch.",
@@ -896,6 +892,8 @@ const PROGRESS_DATA = [
     status: "DEMO",
     statusColor: "#8b5cf6",
     headerColor: "#7fb39a",
+    phase: "active",
+    businessArea: "CSEC",
     summary: "AI sentiment + adherence checking across inbound calls, with per-evaluator priorities (sentiment library, knowledge base).",
     workstream: "Dashboard restructured around CSEC evaluator priorities. Mercy circling back to the CSEC team this week with the updates they requested at the last demo (data presentation bug fix + sentiment library tweaks).",
     nextMilestone: "Send the updated build to the CSEC team this week; capture their feedback; feed into QA library iteration.",
@@ -909,11 +907,43 @@ const PROGRESS_DATA = [
     status: "LIVE",
     statusColor: "#10b981",
     headerColor: "#7fb39a",
+    phase: "active",
+    businessArea: "Cross-Business",
     summary: "Monthly internal newsletter summarising AI progress, wins and how-to tips for the whole business.",
     workstream: "Issue #2 ready to publish &mdash; going live Wednesday 27 May (Mercy timed it for mid-week post-bank-holiday, when reading is highest).",
     nextMilestone: "Issue #2 publishes 27 May; capture open-rate baseline; line up Issue #3 content for end of June.",
     blockers: "None &mdash; live.",
     impact: "Drives AI literacy and visibility across the business; lifts the AI waterline."
+  },
+  {
+    title: "Client-Facing Chatbot",
+    owner: "Rohan",
+    ownerColor: "#1a3a3a",
+    status: "SCOPE",
+    statusColor: "#c47e00",
+    headerColor: "#1a3a3a",
+    phase: "discovery",
+    businessArea: "Cross-Business",
+    summary: "Production-ready Voice Flow chatbot for inbound client queries (webchat + phone), grounded in Bellrock-supplied content.",
+    workstream: "Voice Flow demo done with $1 trial credit (~60% used by one webchat + phone call). Building proposal for production use.",
+    nextMilestone: "Production-cost proposal; pilot scoping; line up first client deployment.",
+    blockers: "Awaiting sign-off on production-cost commercial model.",
+    impact: "Deflects routine queries; first revenue-generating chatbot product in market."
+  },
+  {
+    title: "Teams Transcripts (Andrew / Josh)",
+    owner: "Peter",
+    ownerColor: "#0e6b6b",
+    status: "SCOPE",
+    statusColor: "#c47e00",
+    headerColor: "#0e6b6b",
+    phase: "discovery",
+    businessArea: "Cross-Business",
+    summary: "Captures Teams meeting transcripts and surfaces actions, decisions and follow-ups across the business.",
+    workstream: "Awaiting rescope to see whether this is a small AI project or something larger.",
+    nextMilestone: "Rescope meeting with Andrew + Josh; agree size and shape; assign delivery path.",
+    blockers: "Awaiting rescope decision.",
+    impact: "If large: AI Meeting Note Taker rollout pattern across all staff. If small: targeted action-capture for a specific team."
   },
   {
     title: "AI Avatar Training",
@@ -922,23 +952,27 @@ const PROGRESS_DATA = [
     status: "SCOPE",
     statusColor: "#c47e00",
     headerColor: "#7fb39a",
+    phase: "discovery",
+    businessArea: "Cross-Business",
     summary: "Investigating whether AI Avatars (HeyGen / Synthesia) can be used to deliver Concerto training to internal staff and clients.",
     workstream: "Mercy has Joy's training material and meets Tom from Synthesia on Friday to test requirements fit. Synthesia have form for a free 2-week unlimited trial &mdash; Rich timing it so we can rinse it across CSEC training, HR (Matt, interim CPO) and Health & Safety (Adam, new H&S director) for the Hollie learning modules. Sam strongly endorsed pace on this.",
     nextMilestone: "Synthesia scoping call Friday; secure the 2-week trial window; sample avatar module for CSEC + Hollie learning + HR onboarding.",
     blockers: "Aligning the trial window across CSEC, HR and H&S so we get full value from it.",
     impact: "Faster training rollout; consistent message at scale; potential client-facing revenue stream."
-  }
-  ,{
+  },
+  {
     title: "Proactive Supplier Chase System",
     owner: "Adam Porter / CSEC",
     ownerColor: "#d97706",
     status: "DISCOVERY",
     statusColor: "#c47e00",
     headerColor: "#d97706",
+    phase: "discovery",
+    businessArea: "CSEC",
     summary: "Firework candidate &mdash; an agent that proactively chases suppliers on open jobs and surfaces patterns of chronic non-response.",
-    workstream: "CSEC started capturing wrap-up notes in iPath last week; Critical Engineering hadn\'t rolled iPath in yet so the dataset is just starting. Adam pulling the first ~2 weeks as a litmus test of how often the same client/job recurs. AI Awards candidate &mdash; Rich flagged it as something that could change how the industry chases work orders.",
+    workstream: "CSEC started capturing wrap-up notes in iPath last week; Critical Engineering hadn't rolled iPath in yet so the dataset is just starting. Adam pulling the first ~2 weeks as a litmus test of how often the same client/job recurs. AI Awards candidate &mdash; Rich flagged it as something that could change how the industry chases work orders.",
     nextMilestone: "Pull the 2-week iPath wrap-up snapshot to confirm the size of the prize; build a tight business case; align with Carlo on budget so we can bring in a third-party partner alongside our own AI tooling.",
-    blockers: "iPath data is only 1&ndash;2 weeks old &mdash; not enough to be conclusive yet; third-party partner won\'t engage until the value is sized.",
+    blockers: "iPath data is only 1&ndash;2 weeks old &mdash; not enough to be conclusive yet; third-party partner won't engage until the value is sized.",
     impact: "Releases capacity in CSEC; transforms client-perceived service; potential AI Awards entry."
   },
   {
@@ -948,11 +982,13 @@ const PROGRESS_DATA = [
     status: "DISCOVERY",
     statusColor: "#c47e00",
     headerColor: "#d97706",
+    phase: "discovery",
+    businessArea: "CSEC",
     summary: "Measure open rates on the P1 incident emails sent via Genesis / Outlook so we know which clients are actually reading them.",
     workstream: "Adam putting a request into IT to pull historic open-rate data &mdash; P1 emails follow a standard subject format which should make filtering straightforward. Possibly Genesis has its own open-rate telemetry too.",
-    nextMilestone: "IT pulls a back-period of open-rate data; assess whether it\'s strong enough to build a use case around; feed into the Automated P1 Comms scope.",
+    nextMilestone: "IT pulls a back-period of open-rate data; assess whether it's strong enough to build a use case around; feed into the Automated P1 Comms scope.",
     blockers: "Awaiting IT response on whether Outlook/Genesis can give us historic open-rate data.",
-    impact: "Quantifies the \"are clients actually reading our P1s\" question; underpins the case for the WhatsApp / auto-comms alternatives."
+    impact: "Quantifies the &ldquo;are clients actually reading our P1s&rdquo; question; underpins the case for the WhatsApp / auto-comms alternatives."
   },
   {
     title: "WhatsApp Business P1 Notifications",
@@ -961,8 +997,10 @@ const PROGRESS_DATA = [
     status: "DISCOVERY",
     statusColor: "#c47e00",
     headerColor: "#d97706",
+    phase: "discovery",
+    businessArea: "CSEC",
     summary: "Move P1 incident comms from telephone-only into WhatsApp Business (and / or automated email) where clients want it.",
-    workstream: "Hackathon idea that survived the sleep test. Adam + Sam will sound out client appetite via a short survey at the end of the existing comms flow. Channel choice may flex by client / BYOD policy. If clients don\'t want WhatsApp, fall back to automating the email-and-call workflow instead.",
+    workstream: "Hackathon idea that survived the sleep test. Adam + Sam will sound out client appetite via a short survey at the end of the existing comms flow. Channel choice may flex by client / BYOD policy. If clients don't want WhatsApp, fall back to automating the email-and-call workflow instead.",
     nextMilestone: "Draft + run the client preference survey; come back with a go / no-go on WhatsApp specifically vs auto-email alternative.",
     blockers: "Need client preference data before we can commit a build direction.",
     impact: "Faster, more reliable client comms during P1s; aligns Bellrock with 2026-era client expectations."
@@ -974,10 +1012,12 @@ const PROGRESS_DATA = [
     status: "RESEARCH",
     statusColor: "#0ea5e9",
     headerColor: "#d97706",
-    summary: "Conversational AI front-door for CSEC phone lines &mdash; not a 1990s IVR; one you wouldn\'t know was a bot.",
-    workstream: "Sam very strongly behind this (\"game changer\"). Rich researching off-the-shelf options that can either bolt on to Genesis or stand alongside as we phase Genesis out next year. This is one of the big ones Rich is personally passionate about and a likely AI Awards entry.",
+    phase: "discovery",
+    businessArea: "CSEC",
+    summary: "Conversational AI front-door for CSEC phone lines &mdash; not a 1990s IVR; one you wouldn't know was a bot.",
+    workstream: "Sam very strongly behind this (&ldquo;game changer&rdquo;). Rich researching off-the-shelf options that can either bolt on to Genesis or stand alongside as we phase Genesis out next year. This is one of the big ones Rich is personally passionate about and a likely AI Awards entry.",
     nextMilestone: "Build the out-of-the-box vendor shortlist; figure out the Genesis interlock; feed into the Genesis-replacement decision.",
-    blockers: "Needs to be sequenced with the Genesis contract / replacement decision so we don\'t build twice.",
+    blockers: "Needs to be sequenced with the Genesis contract / replacement decision so we don't build twice.",
     impact: "Reshapes how every phone line in Bellrock operates; AI Awards candidate."
   },
   {
@@ -987,25 +1027,26 @@ const PROGRESS_DATA = [
     status: "SCOPE",
     statusColor: "#c47e00",
     headerColor: "#d97706",
-    summary: "Auto-release red / amber held jobs that meet a client\'s pre-agreed approval criteria (e.g. Costa) instead of an agent ploughing through a list of 100 manually.",
+    phase: "discovery",
+    businessArea: "CSEC",
+    summary: "Auto-release red / amber held jobs that meet a client's pre-agreed approval criteria (e.g. Costa) instead of an agent ploughing through a list of 100 manually.",
     workstream: "Adam confirmed approval criteria are written down for some clients (Costa example), but the criteria do change. Sits at the seam between Concerto-side build and AI &mdash; Rich asking Josh to reach out for more info and link it to the demand-triage thread. Scoot up the priority list.",
     nextMilestone: "Josh to scope the Concerto integration side; confirm how we keep the criteria editable as they shift; agree how this links to demand triage.",
-    blockers: "Criteria changeability &mdash; need a clean editing path so we don\'t hard-code rules that rot.",
+    blockers: "Criteria changeability &mdash; need a clean editing path so we don't hard-code rules that rot.",
     impact: "Removes a manual 100-job-a-day approval queue from CSEC agents; cleaner SLA on releasing red/amber assets."
   }
 ];
 
-function renderProgress(){
-  const grid = document.getElementById("progressGrid");
-  if(!grid) return;
-  grid.innerHTML = PROGRESS_DATA.map(p=>`
+function progressCardHTML(p){
+  const areaTag = p.businessArea ? `<span class="dch-area-tag">${p.businessArea}</span>` : "";
+  return `
     <div class="detail-card">
       <div class="detail-card-header" style="background:${p.headerColor}">
         <div class="dch-eyebrow">${p.owner}</div>
         <h3>${p.title}</h3>
         <div class="dch-sub">${p.summary}</div>
-        <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
-          <span class="status-pill" style="background:${p.statusColor}">${p.status}</span>
+        <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+          ${areaTag}<span class="status-pill" style="background:${p.statusColor}">${p.status}</span>
         </div>
       </div>
       <div class="detail-card-body">
@@ -1016,7 +1057,18 @@ function renderProgress(){
         <div class="detail-row"><div class="dr-label">Expected Impact</div><div class="dr-value">${p.impact}</div></div>
       </div>
     </div>
-  `).join("");
+  `;
+}
+
+function renderProgress(){
+  const active = PROGRESS_DATA.filter(p => p.phase !== "discovery");
+  const discovery = PROGRESS_DATA.filter(p => p.phase === "discovery");
+  const grid = document.getElementById("progressGrid");
+  if(grid) grid.innerHTML = active.map(progressCardHTML).join("");
+  const dGrid = document.getElementById("discoveryGrid");
+  if(dGrid) dGrid.innerHTML = discovery.map(progressCardHTML).join("");
+  const dCount = document.getElementById("discoveryCount");
+  if(dCount) dCount.textContent = discovery.length;
 }
 
 // === Proposed Next Big Projects (5 contenders) ===
