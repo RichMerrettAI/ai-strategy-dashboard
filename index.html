@@ -216,6 +216,10 @@ body {
 .pu-rank.bronze { background: linear-gradient(135deg, #b87333, #e0995c); color: #2a1500; }
 .pu-name { font-weight: 700; }
 .pu-area { display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+.pu-type { display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 999px; }
+.pu-type.user-built { background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; }
+.pu-type.microsoft { background: #f5f3ff; color: #5b21b6; border: 1px solid #ddd6fe; }
+.pu-type.ms-partner { background: #f0fdfa; color: #115e59; border: 1px solid #99f6e4; }
 .pu-msgs { font-weight: 800; color: var(--pine); }
 .pu-bar-cell { width: 22%; }
 .pu-bar-track { background: #f1f5f9; height: 8px; border-radius: 999px; overflow: hidden; }
@@ -223,6 +227,20 @@ body {
 @media (max-width: 720px) {
   .pu-stats { grid-template-columns: repeat(2, 1fr); }
   .pu-bar-cell { display: none; }
+}
+
+/* Copilot usage panel */
+.cop-breakdown { margin-top: 4px; }
+.cop-bd-row { display: grid; grid-template-columns: 200px 1fr 60px; align-items: center; gap: 12px; padding: 7px 0; border-bottom: 1px solid #f1f5f9; }
+.cop-bd-row:last-child { border-bottom: none; }
+.cop-bd-label { font-size: 12px; font-weight: 700; color: #1f2937; }
+.cop-bd-track { background: #f1f5f9; height: 10px; border-radius: 999px; overflow: hidden; }
+.cop-bd-fill { height: 100%; border-radius: 999px; }
+.cop-bd-val { font-size: 13px; font-weight: 800; color: var(--pine); text-align: right; }
+.cop-note { margin-top: 14px; padding: 10px 14px; background: #fff7ed; border: 1px solid #fed7aa; border-radius: 10px; font-size: 12px; color: #9a3412; line-height: 1.45; }
+.pu-stat-trend { font-size: 9px; font-weight: 700; color: #dc2626; margin-top: 2px; }
+@media (max-width: 720px) {
+  .cop-bd-row { grid-template-columns: 130px 1fr 50px; }
 }
 
 /* AI Workforce Tools Calculator */
@@ -513,6 +531,8 @@ body {
     <p class="cp-section-sub">Live figures for every AI tool licence Bellrock has in market. Updated as licence reports come in. Right tool for the right job &mdash; surface duplication, gaps and licence waste.</p>
     <div class="tools-grid" id="toolsGrid"></div>
     <div class="power-users-panel" id="powerUsersPanel"></div>
+    <div class="power-users-panel" id="copilotUsagePanel"></div>
+    <div class="power-users-panel" id="copilotAgentsPanel"></div>
     <div class="tools-ribbon">
       <div class="tools-ribbon-label">WHY THIS MATTERS</div>
       <div class="tools-ribbon-body">Tracking usage live lets us spot duplication, identify gaps, and put the right tool in front of the right person. Power-user concentration shows where champions are emerging and where adoption coaching is still needed.</div>
@@ -1374,6 +1394,126 @@ function renderTools(){
 }
 
 renderTools();
+
+// === MICROSOFT COPILOT USAGE (M365 admin — Copilot analytics) ===
+const COPILOT_USAGE_DATA = {
+  period: "to 26 May 2026",
+  totalActive: 329,
+  adoptionScore: 53,
+  // headline stat tiles
+  stats: [
+    { val: "329", lbl: "Total active Copilot users", trend: "" },
+    { val: "53/100", lbl: "Copilot adoption score", trend: "" },
+    { val: "48", lbl: "M365 Copilot active (of 53 enabled)", trend: "\u2193 29.6% wk on licensed" },
+    { val: "15", lbl: "Active agents (10 active users)", trend: "" }
+  ],
+  // active users by surface — 48 + 281 = the 329 headline; agents/search shown for completeness
+  breakdown: [
+    { label: "Copilot Chat (unlicensed)", value: 281, color: "#a21caf", note: "avg 40 / day" },
+    { label: "M365 Copilot (licensed)", value: 48, color: "#3b82f6", note: "of 53 enabled" },
+    { label: "Active agents", value: 15, color: "#0ea5e9", note: "10 active users" },
+    { label: "Copilot search", value: 1, color: "#94a3b8", note: "1 search" }
+  ],
+  satisfaction: "No feedback from users yet \u2014 satisfaction tracking starts once people begin rating Copilot responses."
+};
+
+function renderCopilotUsage(){
+  const panel = document.getElementById("copilotUsagePanel");
+  if(!panel) return;
+  const d = COPILOT_USAGE_DATA;
+  const max = Math.max.apply(null, d.breakdown.map(b => b.value)) || 1;
+  const statTiles = d.stats.map(s => `
+    <div class="pu-stat">
+      <div class="pu-stat-val">${s.val}</div>
+      <div class="pu-stat-lbl">${s.lbl}</div>
+      ${s.trend ? `<div class="pu-stat-trend">${s.trend}</div>` : ""}
+    </div>
+  `).join("");
+  const bars = d.breakdown.map(b => `
+    <div class="cop-bd-row">
+      <div class="cop-bd-label">${b.label}${b.note ? ` <span style="font-weight:600;color:#94a3b8;font-size:11px">&middot; ${b.note}</span>` : ""}</div>
+      <div class="cop-bd-track"><div class="cop-bd-fill" style="width:${(b.value/max*100).toFixed(0)}%;background:${b.color}"></div></div>
+      <div class="cop-bd-val">${b.value.toLocaleString()}</div>
+    </div>
+  `).join("");
+  panel.innerHTML = `
+    <div class="pu-head">
+      <h3 class="pu-title">Microsoft Copilot &mdash; adoption &amp; usage</h3>
+      <div class="pu-period">${d.period}</div>
+    </div>
+    <p class="pu-sub">Live figures from the Microsoft 365 Copilot analytics dashboard. The headline is the rounded picture &mdash; <strong>329 active Copilot users</strong> across every surface (paid M365 Copilot + free Copilot Chat), plus agents and search. Useful for seeing where adoption actually lands vs the licensed seats.</p>
+    <div class="pu-stats">
+      ${statTiles}
+    </div>
+    <div class="cop-breakdown">
+      ${bars}
+    </div>
+    <div class="cop-note">${d.satisfaction}</div>
+  `;
+}
+
+
+// === MICROSOFT COPILOT AGENTS (Declarative Agents export, 29 May 2026) ===
+const COPILOT_AGENTS_DATA = {
+  source: "Declarative Agents export \u2014 29 May 2026",
+  totals: { inUse: 14, built: 30, responses: 62, users: 22 },
+  agents: [
+    { name: "NerdBot", type: "User-built", users: 1, responses: 16 },
+    { name: "SC Lease Analysis", type: "User-built", users: 4, responses: 10 },
+    { name: "Insurance Lease Summary", type: "User-built", users: 2, responses: 9 },
+    { name: "Researcher", type: "Microsoft", users: 3, responses: 7 },
+    { name: "Consultants Call Agenda", type: "User-built", users: 1, responses: 3 },
+    { name: "DoA Check", type: "User-built", users: 1, responses: 3 },
+    { name: "Invoice Extraction", type: "User-built", users: 1, responses: 3 },
+    { name: "Microsoft 365 Admin", type: "Microsoft", users: 1, responses: 3 },
+    { name: "Meeting Notes", type: "User-built", users: 1, responses: 2 },
+    { name: "Professional Services QA Coach", type: "User-built", users: 4, responses: 2 },
+    { name: "Addresses", type: "User-built", users: 1, responses: 1 },
+    { name: "Commercial Summary", type: "User-built", users: 1, responses: 1 },
+    { name: "Plan My Day", type: "User-built", users: 1, responses: 1 },
+    { name: "TEST AGENT - Contract Insights", type: "User-built", users: 1, responses: 1 }
+  ]
+};
+
+function renderCopilotAgents(){
+  const panel = document.getElementById("copilotAgentsPanel");
+  if(!panel) return;
+  const d = COPILOT_AGENTS_DATA;
+  const max = Math.max.apply(null, d.agents.map(a => a.responses)) || 1;
+  const typeClass = t => t === "Microsoft" ? "microsoft" : (t === "MS partner" ? "ms-partner" : "user-built");
+  const rows = d.agents.map((a, i) => `
+    <tr>
+      <td><span class="pu-rank ${i===0?'gold':i===1?'silver':i===2?'bronze':''}">${i+1}</span></td>
+      <td><span class="pu-name">${a.name}</span></td>
+      <td><span class="pu-type ${typeClass(a.type)}">${a.type}</span></td>
+      <td class="num">${a.users}</td>
+      <td class="num pu-msgs">${a.responses}</td>
+      <td class="pu-bar-cell"><div class="pu-bar-track"><div class="pu-bar-fill" style="width:${(a.responses/max*100).toFixed(0)}%"></div></div></td>
+    </tr>
+  `).join("");
+  panel.innerHTML = `
+    <div class="pu-head">
+      <h3 class="pu-title">Copilot Agents &mdash; what's actually being used</h3>
+      <div class="pu-period">${d.source}</div>
+    </div>
+    <p class="pu-sub">Custom Copilot agents people have built and are actually getting responses from. <strong>${d.totals.inUse} agents are in use</strong> (have sent at least one response); ${d.totals.built} have been built in total. Most are user-built rather than off-the-shelf Microsoft ones &mdash; a good sign people are starting to make Copilot do real work. (The 15-active tile above is the Microsoft analytics dashboard's rolling count; this table is the agent-level export.)</p>
+    <div class="pu-stats">
+      <div class="pu-stat"><div class="pu-stat-val">${d.totals.inUse}</div><div class="pu-stat-lbl">Agents in use</div></div>
+      <div class="pu-stat"><div class="pu-stat-val">${d.totals.built}</div><div class="pu-stat-lbl">Agents built in total</div></div>
+      <div class="pu-stat"><div class="pu-stat-val">${d.totals.responses}</div><div class="pu-stat-lbl">Responses sent to users</div></div>
+      <div class="pu-stat"><div class="pu-stat-val">${d.totals.users}</div><div class="pu-stat-lbl">Users engaging with agents</div></div>
+    </div>
+    <table class="pu-table">
+      <thead>
+        <tr><th>#</th><th>Agent</th><th>Built by</th><th class="num">Users</th><th class="num">Responses</th><th class="pu-bar-cell"></th></tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+}
+
+renderCopilotAgents();
+renderCopilotUsage();
 renderPowerUsers();
 
 // Initial render
