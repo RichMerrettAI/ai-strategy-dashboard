@@ -252,6 +252,8 @@ body {
 .roi-num-projected { color: var(--pine); font-weight: 800; }
 .roi-num-actual    { color: #10b981; font-weight: 800; }
 .roi-num-tbc       { color: #94a3b8; font-weight: 600; font-style: italic; }
+.roi-num-blocked   { color: #dc2626; font-weight: 800; }
+.roi-blocked-tag   { display: inline-block; margin-top: 3px; font-size: 9px; font-weight: 800; letter-spacing: 0.6px; padding: 2px 7px; border-radius: 999px; background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
 .roi-fte { display: inline-block; margin-top: 4px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px; padding: 2px 8px; border-radius: 999px; background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
 .roi-area { display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: 0.5px; padding: 2px 8px; border-radius: 999px; background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; vertical-align: middle; }
 @media (max-width: 800px) {
@@ -1678,7 +1680,7 @@ const ROI_DATA = [
   { project: "CSEC Call Analysis Dashboard", area: "CSEC",                 owner: "Mercy",          ft: "Cost Avoidance",   sub: "Process automation",      projected: null,   actual: 0,    status: "build", note: "Replaces direct Genesis processing cost; lifts QA from sample to 100%. Genesis-side cost baseline TBC." },
   { project: "Building Condition Survey Writer (SurveAI)", area: "Consulting",   owner: "Rohan",          ft: "Cost Saving",      sub: "Process automation",      fte: "~7.5 hrs / report saved (50% reduction)", projected: null, actual: 0, status: "build", note: "Per SBE Delivery Document (Building Survey Assistant, V1.0): current average ~2 days (15 hrs) per report → target ~1 day (~7.5 hrs), a 50% reduction in drafting + QC effort. Sponsor: Dan Weiss · Requester: David Cronje. Azure hosting only, no additional licensing cost. £/yr saving TBC pending reports-per-year volume × surveyor day rate." },
   { project: "Survey Data Capture", area: "IAC",                          owner: "Mir",            ft: "Cost Saving",      sub: "Process automation",      projected: null,   actual: 0,    status: "build", note: "Underpins the 1,700-survey IAC commitment by July 2027. Per-survey time + cost saving to be sized once refined requirements land." },
-  { project: "Certificate Check", area: "CSEC",                            owner: "Mir",            ft: "Cost Saving",      sub: "Headcount saving",        projected: 16765,  actual: 0,    status: "build", note: "Phase 1 sized saving = £16,765/yr (Coffee Machine + PAT scope) per case study — ~98% recovery against £17,098 manual cost; running cost £333/yr. CSEC team currently 7 reviewers @ £36k each (£252k team cost) processing ~105,944 certs/yr at ~6 min each. Full-scope saving TBC as later phases roll out." },
+  { project: "Certificate Check", area: "CSEC", owner: "Mir", ft: "Cost Saving", sub: "Headcount saving", projected: 235000, actual: 17000, blocked: true, status: "build", note: "Full-programme potential ~£235k/yr (Rich, 2 June) once Cert Check scales across the ~105,944 cert annual workload at ~98% recovery (CSEC team baseline £252k, 7 reviewers @ £36k). Phase 1 saving sized £16,765/yr (Coffee Machine PPM + PAT scope) per case study — ready to release the moment Dan unblocks the API auth key + test environment. Shown in red until the unblock lands; not included in the realised totaliser until then." },
   { project: "Redaction (PII) Project", area: "Cross-Business",                      owner: "Peter",          ft: "Cost Avoidance",   sub: "Risk avoidance",          projected: 100000, actual: 0,    status: "build", note: "Projected at \u00a3100k/yr saving (Rich, 2 June). Net of any scope (e.g. audio) we keep external-sourced; external company today costs ~\u00a3200k/yr." },
   { project: "Timesheet Intelligence", area: "CE",                       owner: "Peter",          ft: "Cost Saving",      sub: "Process automation",      projected: null,   actual: 0,    status: "build", note: "Per case study: 1–2 hrs/week senior reviewer time recovered (4–8 hrs/month). Only direct cost is £60/month EPIX API charge — covered by saving in month one. Case study deliberately does not headline a £ saving as the primary value is audit / risk control. Headline £ TBC." },
   { project: "AI Avatar Training (Synthesia)", area: "Cross-Business",               owner: "Mercy",          ft: "Cost Saving",      sub: "Headcount saving",        projected: null,   actual: 0,    status: "tbc",   note: "Sam working on costings. Replaces manual supplier / induction training delivery time." },
@@ -1728,7 +1730,8 @@ function renderRoi(){
       totals.proj += r.projected;
       totals.byFt[r.ft] = (totals.byFt[r.ft] || 0) + r.projected;
     }
-    if (typeof r.actual === "number") totals.act += r.actual;
+    // Blocked actuals are sized but not yet released — don't add to the totaliser
+    if (typeof r.actual === "number" && !r.blocked) totals.act += r.actual;
   });
   const ftColors = { "Cost Saving": "#3b82f6", "Cost Avoidance": "#d97706", "Revenue Generating": "#10b981" };
   const stackSegs = FT_DEFS.map(f => {
@@ -1746,11 +1749,17 @@ function renderRoi(){
   const realised = totals.proj > 0 ? (totals.act / totals.proj * 100).toFixed(1) : "0.0";
 
   const sized = ROI_DATA.filter(r => typeof r.projected === "number" && r.projected > 0).length;
-  const realisedCount = ROI_DATA.filter(r => typeof r.actual === "number" && r.actual > 0).length;
+  const realisedCount = ROI_DATA.filter(r => typeof r.actual === "number" && r.actual > 0 && !r.blocked).length;
   const rows = ROI_DATA.map(r => {
     const ftCls = FT_DEFS.find(f => f.key === r.ft)?.cls || "cs";
     const projCell = r.projected === null ? `<span class="roi-num-tbc">TBC</span>` : `<span class="roi-num-projected">${fmtGBP(r.projected)}</span>`;
-    const actCell  = r.actual === null ? `<span class="roi-num-tbc">&mdash;</span>` : (r.actual === 0 ? `<span class="roi-num-tbc">&mdash;</span>` : `<span class="roi-num-actual">${fmtGBP(r.actual)}</span>`);
+    const actCell  = r.actual === null
+      ? `<span class="roi-num-tbc">&mdash;</span>`
+      : (r.actual === 0
+          ? `<span class="roi-num-tbc">&mdash;</span>`
+          : (r.blocked
+              ? `<span class="roi-num-blocked">${fmtGBP(r.actual)}</span><br><span class="roi-blocked-tag">BLOCKED · ready to release</span>`
+              : `<span class="roi-num-actual">${fmtGBP(r.actual)}</span>`));
     const statusCls = r.status === "live" ? "live" : (r.status === "build" ? "build" : "tbc");
     const statusLabel = r.status === "live" ? "LIVE" : (r.status === "build" ? "BUILD" : "TBC");
     return `
