@@ -1675,12 +1675,12 @@ renderPowerUsers();
 
 // === ROI TRACKING ===
 const ROI_DATA = [
-  { project: "Bellrock AI Newsletter", area: "Cross-Business",                       owner: "Mercy",          ft: "Cost Avoidance",   sub: "Hiring avoidance",        fte: "1 person-day / fortnight", projected: 8400, actual: 0, status: "live", note: "Per Arunn (2 June): if Bellrock had an internal comms exec / content person doing this it would be ~1 person-day\'s work per fortnight, costing ~£600–800/month (£7.2–9.6k/yr). Midpoint ~£8.4k/yr used here. AI Team produces it instead — hiring avoidance." },
+  { project: "Bellrock AI Newsletter", area: "Cross-Business",                       owner: "Mercy",          ft: "Cost Avoidance",   sub: "Hiring avoidance",        fte: "1 person-day / fortnight", projected: 8400, actual: 700, status: "live", note: "Per Arunn (2 June): if Bellrock had an internal comms exec / content person doing this it would be ~1 person-day\'s work per fortnight, costing ~£600–800/month (£7.2–9.6k/yr). Midpoint ~£8.4k/yr used here. AI Team produces it instead — hiring avoidance. **£700 realised after 1 month live** (1 month × midpoint £700/mo of Arunn's £600–800 range). Actual will tick up monthly." },
   { project: "Worksheet Processor (Jordon)", area: "CE",                 owner: "Mercy",          ft: "Cost Saving",      sub: "Headcount saving",        fte: "25–40 hrs/wk recovered", projected: null, actual: 0, status: "build", note: "Per Mercy\'s user deck (May 2026): ~85 subcontractor worksheets/day processed automatically; seconds per worksheet to produce a Jordon-format Word doc. Replaces 25–40 hrs/week of manual re-keying across the Jordon service team. Phase 1 (typed) live in BellrockAI; Phase 2 (handwritten accuracy) in progress; signature capture live. £/yr TBC pending service-team loaded day rate." },
   { project: "CSEC Call Analysis Dashboard", area: "CSEC",                 owner: "Mercy",          ft: "Cost Avoidance",   sub: "Process automation",      projected: null,   actual: 0,    status: "build", note: "Replaces direct Genesis processing cost; lifts QA from sample to 100%. Genesis-side cost baseline TBC." },
   { project: "Building Condition Survey Writer (SurveAI)", area: "Consulting",   owner: "Rohan",          ft: "Cost Saving",      sub: "Process automation",      fte: "~7.5 hrs / report saved (50% reduction)", projected: null, actual: 0, status: "build", note: "Per SBE Delivery Document (Building Survey Assistant, V1.0): current average ~2 days (15 hrs) per report → target ~1 day (~7.5 hrs), a 50% reduction in drafting + QC effort. Sponsor: Dan Weiss · Requester: David Cronje. Azure hosting only, no additional licensing cost. £/yr saving TBC pending reports-per-year volume × surveyor day rate." },
   { project: "Survey Data Capture", area: "IAC",                          owner: "Mir",            ft: "Cost Saving",      sub: "Process automation",      projected: null,   actual: 0,    status: "build", note: "Underpins the 1,700-survey IAC commitment by July 2027. Per-survey time + cost saving to be sized once refined requirements land." },
-  { project: "Certificate Check", area: "CSEC", owner: "Mir", ft: "Cost Saving", sub: "Headcount saving", projected: 235000, actual: 17000, blocked: true, status: "build", note: "Full-programme potential ~£235k/yr (Rich, 2 June) once Cert Check scales across the ~105,944 cert annual workload at ~98% recovery (CSEC team baseline £252k, 7 reviewers @ £36k). Phase 1 saving sized £16,765/yr (Coffee Machine PPM + PAT scope) per case study — ready to release the moment Dan unblocks the API auth key + test environment. Shown in red until the unblock lands; not included in the realised totaliser until then." },
+  { project: "Certificate Check", area: "CSEC", owner: "Mir", ft: "Cost Saving", sub: "Headcount saving", projected: 235000, actual: 16700, blocked: true, status: "build", note: "Full-programme potential ~£235k/yr (Rich, 2 June) once Cert Check scales across the ~105,944 cert annual workload at ~98% recovery (CSEC team baseline £252k, 7 reviewers @ £36k). Phase 1 saving sized £16,765/yr (Coffee Machine PPM + PAT scope) per case study — ready to release the moment Dan unblocks the API auth key + test environment. Shown in red until the unblock lands; not included in the realised totaliser until then." },
   { project: "Redaction (PII) Project", area: "Cross-Business",                      owner: "Peter",          ft: "Cost Avoidance",   sub: "Risk avoidance",          projected: 100000, actual: 0,    status: "build", note: "Projected at \u00a3100k/yr saving (Rich, 2 June). Net of any scope (e.g. audio) we keep external-sourced; external company today costs ~\u00a3200k/yr." },
   { project: "Timesheet Intelligence", area: "CE",                       owner: "Peter",          ft: "Cost Saving",      sub: "Process automation",      projected: null,   actual: 0,    status: "build", note: "Per case study: 1–2 hrs/week senior reviewer time recovered (4–8 hrs/month). Only direct cost is £60/month EPIX API charge — covered by saving in month one. Case study deliberately does not headline a £ saving as the primary value is audit / risk control. Headline £ TBC." },
   { project: "AI Avatar Training (Synthesia)", area: "Cross-Business",               owner: "Mercy",          ft: "Cost Saving",      sub: "Headcount saving",        projected: null,   actual: 0,    status: "tbc",   note: "Sam working on costings. Replaces manual supplier / induction training delivery time." },
@@ -1708,8 +1708,14 @@ const FT_DEFS = [
 function fmtGBP(n){
   if (n === null || n === undefined) return null;
   if (n === 0) return "\u00a30";
-  if (n >= 1e6) return "\u00a3" + (n/1e6).toFixed(1) + "m";
-  if (n >= 1e3) return "\u00a3" + (n/1e3).toFixed(0) + "k";
+  if (n >= 1e6) {
+    const m = n/1e6;
+    return "\u00a3" + (m % 1 === 0 ? m.toFixed(0) : m.toFixed(1)) + "m";
+  }
+  if (n >= 1e3) {
+    const k = n/1e3;
+    return "\u00a3" + (k % 1 === 0 ? k.toFixed(0) : k.toFixed(1)) + "k";
+  }
   return "\u00a3" + n.toLocaleString();
 }
 
@@ -1764,7 +1770,8 @@ function renderRoi(){
     const statusLabel = r.status === "live" ? "LIVE" : (r.status === "build" ? "BUILD" : "TBC");
     return `
       <tr class="${r.status==='live'?'is-active':''}">
-        <td><strong>${r.project}</strong><br><span style="font-size:11px;color:#64748b">${r.owner}</span>${r.area ? ` <span class="roi-area">${r.area}</span>` : ""}${r.fte ? `<br><span class="roi-fte">${r.fte}</span>` : ""}</td>
+        <td><strong>${r.project}</strong><br><span style="font-size:11px;color:#64748b">${r.owner}</span>${r.fte ? `<br><span class="roi-fte">${r.fte}</span>` : ""}</td>
+        <td>${r.area ? `<span class="roi-area">${r.area}</span>` : ""}</td>
         <td><span class="roi-pill-ft ${ftCls}">${r.ft}</span></td>
         <td><span class="roi-sub">${r.sub}</span></td>
         <td class="num">${projCell}</td>
@@ -1802,7 +1809,7 @@ function renderRoi(){
       </div>
       <table class="roi-table">
         <thead>
-          <tr><th>Project / Owner</th><th>Financial type</th><th>Sub-category</th><th class="num">Projected</th><th class="num">Actual</th><th>Status</th><th>Notes</th></tr>
+          <tr><th>Project / Owner</th><th>Team</th><th>Financial type</th><th>Sub-category</th><th class="num">Projected</th><th class="num">Actual</th><th>Status</th><th>Notes</th></tr>
         </thead>
         <tbody>${rows}</tbody>
       </table>
