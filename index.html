@@ -261,6 +261,40 @@ body {
   .roi-totals-row { grid-template-columns: 1fr; }
 }
 
+/* Operational (non-financial) value lens */
+.roi-nf-intro { font-size: 12px; color: #64748b; line-height: 1.5; margin: 2px 0 12px; }
+.roi-nf-band { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 18px; }
+.roi-nf-tile { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 18px 20px; border-top: 4px solid var(--tile-c, #7c3aed); }
+.roi-nf-tile .nf-eyebrow { font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; font-weight: 800; color: var(--tile-c, #7c3aed); }
+.roi-nf-tile .nf-count { font-size: 30px; font-weight: 800; color: #1f2937; margin-top: 2px; line-height: 1.05; }
+.roi-nf-tile .nf-count span { font-size: 13px; font-weight: 700; color: #94a3b8; }
+.roi-nf-tile .nf-desc { font-size: 11px; color: #64748b; line-height: 1.45; margin-top: 8px; }
+.roi-nf-tile .nf-subs { margin-top: 10px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.roi-nf-tile .nf-subs span { color: var(--tile-c, #7c3aed); margin-right: 10px; white-space: nowrap; }
+
+.roi-pill-nf { display: inline-block; font-size: 10px; font-weight: 800; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+.roi-pill-nf.tp { background: #ede9fe; color: #5b21b6; }
+.roi-pill-nf.ql { background: #fce7f3; color: #9d174d; }
+.roi-pill-nf.xp { background: #cffafe; color: #155e75; }
+
+.roi-lens-toggle { display: inline-flex; gap: 3px; background: #f1f5f9; border-radius: 9px; padding: 3px; }
+.roi-lens-btn { border: none; background: transparent; font-family: inherit; font-size: 11px; font-weight: 800; letter-spacing: 0.3px; padding: 6px 14px; border-radius: 7px; cursor: pointer; color: #64748b; transition: all 0.15s; }
+.roi-lens-btn.active { background: #fff; color: var(--pine); box-shadow: 0 1px 4px rgba(0,0,0,0.12); }
+.roi-lens-btn:hover:not(.active) { color: var(--fir); }
+
+.roi-reading { line-height: 1.4; }
+.roi-reading .rr-base { font-size: 11px; color: #94a3b8; }
+.roi-reading .rr-arrow { color: #cbd5e1; margin: 0 4px; }
+.roi-reading .rr-now { font-size: 12px; color: #1f2937; font-weight: 700; }
+.roi-reading .rr-measure { display: block; font-size: 10px; color: #64748b; margin-top: 2px; }
+.roi-reading .rr-target { font-size: 12px; color: #1e40af; font-weight: 700; }
+.roi-reading .rr-target::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--pine); margin-right: 6px; vertical-align: 1px; }
+.roi-reading .rr-now::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #10b981; margin-right: 6px; vertical-align: 1px; }
+
+@media (max-width: 800px) {
+  .roi-nf-band { grid-template-columns: 1fr; }
+}
+
 /* Progress card business-area tag */
 .dch-area-tag { display: inline-block; font-size: 9px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; background: rgba(255,255,255,0.22); color: #fff; border: 1px solid rgba(255,255,255,0.4); margin-right: 6px; }
 .progress-section-sub-title { font-size: 13px; font-weight: 700; color: var(--fir); margin: 26px 0 8px; padding-top: 18px; border-top: 1px solid #e2e8f0; letter-spacing: -0.1px; }
@@ -1705,6 +1739,39 @@ const FT_DEFS = [
   { key: "Revenue Generating", cls: "rg", definition: "Creates new income or grows existing revenue. New AI-enabled services, improved win rates, customer-facing AI products.",                       subs: ["New AI service", "Win-rate improvement", "Customer-facing AI product"] }
 ];
 
+// Operational (non-financial) value lens. Measured in native units against a baseline, not in £.
+const NF_DEFS = [
+  { key: "Throughput", cls: "tp", colour: "#7c3aed", definition: "Volume of work processed, or capacity and time released. Measured in jobs, documents, hours or FTE-equivalent against a baseline.", subs: ["Volume processed", "Time per task", "Capacity released"] },
+  { key: "Quality",    cls: "ql", colour: "#db2777", definition: "Accuracy, consistency or score of the output. Measured as a % or score against a baseline. Answers \u2018is the output any good\u2019.",   subs: ["Accuracy", "Consistency", "Compliance"] },
+  { key: "Experience", cls: "xp", colour: "#0891b2", definition: "Service, responsiveness and confidence \u2014 client and people facing. Measured via NPS, CSAT, response time, reach or engagement.",       subs: ["Service / SLA", "Engagement", "Reach & adoption"] }
+];
+
+// Keyed by exact project name in ROI_DATA. baseline \u2192 current is the proof; measure is the unit.
+const NF_MAP = {
+  "Bellrock AI Newsletter":                                  { type: "Experience", sub: "Reach & adoption",       baseline: "No single AI channel",                  measure: "Reach + read rate",                    target: "Monthly all-staff cadence",                  realised: "Issue #2 live via Lighthouse" },
+  "Worksheet Processor (Jordon)":                            { type: "Throughput", sub: "Volume processed",       baseline: "25\u201340 hrs/wk re-keying",          measure: "Worksheets/day + hrs recovered",       target: "~85/day automated; ~2 hrs/wk residual",      realised: "Build complete; pushing to main this wk" },
+  "CSEC Call Analysis Dashboard":                            { type: "Quality",    sub: "Consistency",            baseline: "Sample-based QA",                       measure: "% of calls QA\u2019d",                target: "100% call coverage",                         realised: "Build complete (Genesis unblocked); awaiting William" },
+  "Building Condition Survey Writer (SurveAI)":              { type: "Throughput", sub: "Time per task",          baseline: "~15 hrs/report",                        measure: "Drafting hrs/report",                  target: "~7.5 hrs/report (50% reduction)",            realised: "All surveyor recs in; production push this/next wk" },
+  "Survey Data Capture":                                     { type: "Throughput", sub: "Volume processed",       baseline: "Manual room-by-room",                   measure: "Surveys/period",                       target: "1,700 surveys by Jul 2027 (IAC commit)",     realised: "Refined reqs in flight; demo Fri 12 Jun" },
+  "Certificate Check":                                       { type: "Throughput", sub: "Volume processed",       baseline: "7 reviewers manual \u00b7 105,944 certs/yr", measure: "Cert recovery rate",                target: "~98% recovery across full workload",         realised: "Phase 1 sized (\u00a316.7k); blocked on Dan API" },
+  "Redaction (PII) Project":                                 { type: "Quality",    sub: "Consistency",            baseline: "Manual, inconsistent",                  measure: "Throughput vs 1-mo/request budget",   target: "Hit 1-mo SLA per DSAR",                      realised: "Synthetic test data being built; PPT/Word/Excel/CSV/PST handled" },
+  "Timesheet Intelligence":                                  { type: "Quality",    sub: "Compliance",             baseline: "Manual reconciliation",                 measure: "Reviewer hrs + anomalies caught",     target: "4\u20138 hrs/mo reviewer time recovered",     realised: "Ready to wire; awaiting Epics release" },
+  "AI Avatar Training (Synthesia)":                          { type: "Throughput", sub: "Capacity released",      baseline: "Instructor-led, bottlenecked",          measure: "Courses produced / refresh time",     target: "AI-produced training modules at scale",      realised: "Synthesia scoping; Tom-to-team intro pending" },
+  "SI Bid Writer V30":                                       { type: "Quality",    sub: "Accuracy",               baseline: "Manual drafting",                       measure: "Eval score + draft time",             target: "Match/beat 69/70 priv \u00b7 10/10 gov \u00b7 94% faster", realised: "Live \u00b7 1.49K chats / 9 users last 12 mo" },
+  "Bellrock AI Gateway + AI Portal":                         { type: "Throughput", sub: "Capacity released",      baseline: "Ad-hoc tool sprawl",                    measure: "Governed tools live",                 target: "Central catalogue replacing shadow AI",      realised: "15 tools live" },
+  "Custom GPT Hosting on Bellrock AI Portal":                { type: "Throughput", sub: "Capacity released",      baseline: "Separate Enterprise seats",             measure: "GPTs hosted / seats displaced",       target: "All Consulting GPTs on portal",              realised: "Demo in flight" },
+  "Asset Capture (Strategic Engagement)":                    { type: "Throughput", sub: "Time per task",          baseline: "Manual 6-facet survey",                 measure: "Time/survey + quality",               target: "Strategic-partner 8-wk build",               realised: "Scoping" },
+  "QS Cost Mgmt & Benchmarking (Strategic Engagement #2)":   { type: "Quality",    sub: "Accuracy",               baseline: "BCIS / personal experience",            measure: "Benchmark response time + accuracy",   target: "Productised benchmarking service",           realised: "Scoping" },
+  "Lens Invoice Validation (LEAPFROG)":                      { type: "Quality",    sub: "Accuracy",               baseline: "100% manual (iPath)",                   measure: "Extraction + decision accuracy",      target: "98% extract / 95% decision",                 realised: "Scoping / design" },
+  "Lens Costing Validation (Worksheets)":                    { type: "Quality",    sub: "Accuracy",               baseline: "100% manual (iPath)",                   measure: "Accuracy: typed vs handwritten",      target: "95\u201396% across both modes",             realised: "Phase 2 \u2014 awaits Phase 1" },
+  "Proactive Supplier Chase System":                         { type: "Experience", sub: "Service / SLA",          baseline: "Manual 48-hr phone chasing",            measure: "SLA hit rate + chases/job",           target: "Auto-tiered escalation",                     realised: "Awaiting 2-wk iPath snapshot" },
+  "AI Voice Triage Agent (CSEC Helpdesk)":                   { type: "Experience", sub: "Service / SLA",          baseline: "All calls human-handled",               measure: "Wait time + autonomous resolution %", target: "Reduce wait time + autonomous handle %",     realised: "Vendor research" },
+  "Red Asset Approval Statement Automation":                 { type: "Quality",    sub: "Compliance",             baseline: "Manual lookup mid-call",                measure: "Statement compliance %",              target: "Auto-statement against client criteria",     realised: "Scoping (Josh)" },
+  "Sync \u2014 Trading Floor & Dynamic Work Allocation":     { type: "Experience", sub: "Engagement",             baseline: "No forward-buy mechanism",              measure: "Utilisation rate + adoption",         target: "Pilot demo Aug 2026; client adoption",       realised: "Pilot business case in flight (Steve)" },
+  "Weather-Driven Predictive Maintenance":                   { type: "Quality",    sub: "Accuracy",               baseline: "Rota-based maintenance",                measure: "Reactive callouts avoided",           target: "Reactive callouts reduced via weather signal", realised: "Correlation discovery \u2014 ideation" },
+  "Executive Voice Programme (Carlo + 4 MDs)":               { type: "Experience", sub: "Engagement",             baseline: "Agency-produced voice (Carlo)",         measure: "LinkedIn engagement growth",          target: "AI-driven voice across Carlo + 4 MDs",      realised: "Carlo live (Wk1); 4 MDs scaling" }
+};
+
 function fmtGBP(n){
   if (n === null || n === undefined) return null;
   if (n === 0) return "\u00a30";
@@ -1731,13 +1798,17 @@ function renderRoi(){
   `).join("");
 
   const totals = { proj: 0, act: 0, byFt: {"Cost Saving": 0, "Cost Avoidance": 0, "Revenue Generating": 0} };
+  totals.actByFt = {"Cost Saving": 0, "Cost Avoidance": 0, "Revenue Generating": 0};
   ROI_DATA.forEach(r => {
     if (typeof r.projected === "number") {
       totals.proj += r.projected;
       totals.byFt[r.ft] = (totals.byFt[r.ft] || 0) + r.projected;
     }
     // Blocked actuals are sized but not yet released — don't add to the totaliser
-    if (typeof r.actual === "number" && !r.blocked) totals.act += r.actual;
+    if (typeof r.actual === "number" && !r.blocked) {
+      totals.act += r.actual;
+      totals.actByFt[r.ft] = (totals.actByFt[r.ft] || 0) + r.actual;
+    }
   });
   const ftColors = { "Cost Saving": "#3b82f6", "Cost Avoidance": "#d97706", "Revenue Generating": "#10b981" };
   const stackSegs = FT_DEFS.map(f => {
@@ -1751,6 +1822,21 @@ function renderRoi(){
     const v = totals.byFt[f.key] || 0;
     const pct = totals.proj > 0 ? (v / totals.proj * 100) : 0;
     return `<div><span class="swatch" style="background:${ftColors[f.key]}"></span>${f.key} &mdash; ${fmtGBP(v)} (${pct.toFixed(0)}%)</div>`;
+  }).join("");
+  // Realised parallels (same colour palette)
+  const realisedStackSegs = FT_DEFS.map(f => {
+    const v = totals.actByFt[f.key] || 0;
+    const pct = totals.act > 0 ? (v / totals.act * 100) : 0;
+    return v > 0
+      ? `<div class="roi-stack-seg" style="background:${ftColors[f.key]};width:${pct.toFixed(1)}%" title="${f.key}: ${fmtGBP(v)}">${pct >= 15 ? fmtGBP(v) : ""}</div>`
+      : "";
+  }).join("");
+  const realisedLegend = FT_DEFS.map(f => {
+    const v = totals.actByFt[f.key] || 0;
+    const pct = totals.act > 0 ? (v / totals.act * 100) : 0;
+    return v > 0
+      ? `<div><span class="swatch" style="background:${ftColors[f.key]}"></span>${f.key} &mdash; ${fmtGBP(v)} (${pct.toFixed(0)}%)</div>`
+      : `<div style="opacity:0.45"><span class="swatch" style="background:${ftColors[f.key]}"></span>${f.key} &mdash; &pound;0</div>`;
   }).join("");
   const realised = totals.proj > 0 ? (totals.act / totals.proj * 100).toFixed(1) : "0.0";
 
@@ -1782,6 +1868,50 @@ function renderRoi(){
     `;
   }).join("");
 
+  // --- Operational (non-financial) value lens ---
+  const nfCounts = { "Throughput": 0, "Quality": 0, "Experience": 0 };
+  ROI_DATA.forEach(r => { const nf = NF_MAP[r.project]; if (nf) nfCounts[nf.type] = (nfCounts[nf.type] || 0) + 1; });
+  const nfMapped = ROI_DATA.filter(r => NF_MAP[r.project]).length;
+
+  const nfBand = NF_DEFS.map(d => `
+    <div class="roi-nf-tile" style="--tile-c:${d.colour}">
+      <div class="nf-eyebrow">${d.key}</div>
+      <div class="nf-count">${nfCounts[d.key] || 0} <span>project${(nfCounts[d.key]||0)===1?'':'s'}</span></div>
+      <div class="nf-desc">${d.definition}</div>
+      <div class="nf-subs">${d.subs.map(s => `<span>${s}</span>`).join("")}</div>
+    </div>
+  `).join("");
+
+  const opsRows = ROI_DATA.map(r => {
+    const nf = NF_MAP[r.project];
+    const statusCls = r.status === "live" ? "live" : (r.status === "build" ? "build" : "tbc");
+    const statusLabel = r.status === "live" ? "LIVE" : (r.status === "build" ? "BUILD" : "TBC");
+    const nfCls = nf ? (NF_DEFS.find(d => d.key === nf.type)?.cls || "tp") : "tp";
+    const typeCell = nf ? `<span class="roi-pill-nf ${nfCls}">${nf.type}</span>` : `<span class="roi-num-tbc">&mdash;</span>`;
+    const subCell  = nf ? `<span class="roi-sub">${nf.sub}</span>` : "";
+    const baselineCell = nf
+      ? `<div class="roi-reading"><span class="rr-base">${nf.baseline}</span><span class="rr-measure">Measure: ${nf.measure}</span></div>`
+      : `<span class="roi-num-tbc">Not yet mapped</span>`;
+    const targetCell = nf
+      ? `<div class="roi-reading"><span class="rr-target">${nf.target}</span></div>`
+      : `<span class="roi-num-tbc">&mdash;</span>`;
+    const realisedCellOps = nf
+      ? `<div class="roi-reading"><span class="rr-now">${nf.realised}</span></div>`
+      : `<span class="roi-num-tbc">&mdash;</span>`;
+    return `
+      <tr class="${r.status==='live'?'is-active':''}">
+        <td><strong>${r.project}</strong><br><span style="font-size:11px;color:#64748b">${r.owner}</span></td>
+        <td>${r.area ? `<span class="roi-area">${r.area}</span>` : ""}</td>
+        <td>${typeCell}</td>
+        <td>${subCell}</td>
+        <td>${baselineCell}</td>
+        <td>${targetCell}</td>
+        <td>${realisedCellOps}</td>
+        <td><span class="roi-status-pill ${statusCls}">${statusLabel}</span></td>
+      </tr>
+    `;
+  }).join("");
+
   panel.innerHTML = `
     <div class="roi-cat-grid">${catCards}</div>
     <div class="roi-totals-row">
@@ -1796,25 +1926,48 @@ function renderRoi(){
         <div class="roi-total-eyebrow">Realised ROI &middot; evidenced to date</div>
         <div class="roi-total-val">${fmtGBP(totals.act)}</div>
         <div class="roi-total-sub">${realisedCount} project${realisedCount===1?'':'s'} reporting actuals &middot; ${realised}% of projected realised so far</div>
-        <div style="margin-top:14px;background:#f1f5f9;border-radius:10px;height:28px;overflow:hidden">
-          <div style="background:#10b981;width:${Math.min(realised, 100)}%;height:100%"></div>
-        </div>
+        <div class="roi-stack-bar">${realisedStackSegs || '<div style="background:#f1f5f9;width:100%"></div>'}</div>
+        <div class="roi-stack-legend">${realisedLegend}</div>
         <div style="font-size:11px;color:#94a3b8;margin-top:8px">Sylvia (joining July) will own the evidenced-actuals capture every 3 months.</div>
       </div>
     </div>
+    <div class="roi-nf-intro"><strong>Operational value</strong> &mdash; the proof that doesn't carry a &pound; sign (yet). Each project is also measured in its own native unit against a baseline, so we can show a project is working before its &pound; figure is sized. ${nfMapped} of ${ROI_DATA.length} projects mapped.</div>
+    <div class="roi-nf-band">${nfBand}</div>
     <div class="roi-table-wrap">
       <div class="roi-table-head">
         <h3>Per-project ROI</h3>
-        <div class="roi-count">${ROI_DATA.length} projects in ROI scope</div>
+        <div class="roi-lens-toggle">
+          <button class="roi-lens-btn active" id="lensFinBtn" onclick="setRoiLens('fin')">&pound; Financial lens</button>
+          <button class="roi-lens-btn" id="lensOpsBtn" onclick="setRoiLens('ops')">Operational lens</button>
+        </div>
       </div>
-      <table class="roi-table">
+      <table class="roi-table" id="roiTableFin">
         <thead>
           <tr><th>Project / Owner</th><th>Team</th><th>Financial type</th><th>Sub-category</th><th class="num">Projected</th><th class="num">Actual</th><th>Status</th><th>Notes</th></tr>
         </thead>
         <tbody>${rows}</tbody>
       </table>
+      <table class="roi-table" id="roiTableOps" style="display:none">
+        <thead>
+          <tr><th>Project / Owner</th><th>Team</th><th>Operational value</th><th>Sub-category</th><th>Baseline</th><th>Target / Projected</th><th>Realised / Now</th><th>Status</th></tr>
+        </thead>
+        <tbody>${opsRows}</tbody>
+      </table>
     </div>
   `;
+}
+
+function setRoiLens(lens){
+  const fin = document.getElementById("roiTableFin");
+  const ops = document.getElementById("roiTableOps");
+  const finBtn = document.getElementById("lensFinBtn");
+  const opsBtn = document.getElementById("lensOpsBtn");
+  if (!fin || !ops) return;
+  const showFin = lens === "fin";
+  fin.style.display = showFin ? "" : "none";
+  ops.style.display = showFin ? "none" : "";
+  finBtn.classList.toggle("active", showFin);
+  opsBtn.classList.toggle("active", !showFin);
 }
 
 renderRoi();
