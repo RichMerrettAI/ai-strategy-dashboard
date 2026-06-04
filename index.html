@@ -326,6 +326,8 @@ body {
 .pu-type.user-built { background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; }
 .pu-type.microsoft { background: #f5f3ff; color: #5b21b6; border: 1px solid #ddd6fe; }
 .pu-type.ms-partner { background: #f0fdfa; color: #115e59; border: 1px solid #99f6e4; }
+.gh-cap { display: inline-block; font-size: 9px; font-weight: 800; letter-spacing: 0.5px; padding: 1px 6px; border-radius: 999px; background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; margin-left: 4px; vertical-align: 1px; }
+.gh-note { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 14px; margin-top: 14px; font-size: 11.5px; line-height: 1.5; color: #475569; }
 .pu-msgs { font-weight: 800; color: var(--pine); }
 .pu-bar-cell { width: 22%; }
 .pu-bar-track { background: #f1f5f9; height: 8px; border-radius: 999px; overflow: hidden; }
@@ -640,6 +642,7 @@ body {
     <div class="power-users-panel" id="powerUsersPanel"></div>
     <div class="power-users-panel" id="copilotUsagePanel"></div>
     <div class="power-users-panel" id="copilotAgentsPanel"></div>
+    <div class="power-users-panel" id="githubCopilotPanel"></div>
     <div class="tools-ribbon">
       <div class="tools-ribbon-label">WHY THIS MATTERS</div>
       <div class="tools-ribbon-body">Tracking usage live lets us spot duplication, identify gaps, and put the right tool in front of the right person. Power-user concentration shows where champions are emerging and where adoption coaching is still needed.</div>
@@ -1703,6 +1706,71 @@ function renderCopilotAgents(){
   `;
 }
 
+// === GITHUB COPILOT (Engineers) — usage from April + May 2026 admin exports ===
+const GITHUB_COPILOT_DATA = {
+  source: "GitHub Copilot admin exports — Apr + May 2026",
+  months: [
+    { month: "Apr 2026", users: 24, premium_requests: 8669, premium_gross: 273.67, premium_net: 0,    aic_completions: null,   aic_gross: null,    cap_hits: 0 },
+    { month: "May 2026", users: 26, premium_requests: 10637, premium_gross: 425.49, premium_net: 0,   aic_completions: 369616, aic_gross: 3696.16, cap_hits: 5 }
+  ],
+  cap: 1000,
+  top_users_may: [
+    { user: "David W (Bellrock)",          requests: 1000, completions: 5723,   capped: true },
+    { user: "Phil Bray",                   requests: 1000, completions: null,   capped: true },
+    { user: "Arshad (Concerto)",           requests: 1000, completions: 139061, capped: true },
+    { user: "Steve Derycke",               requests: 1000, completions: 10715,  capped: true },
+    { user: "ST (Bellrock)",               requests: 1000, completions: 50446,  capped: true },
+    { user: "Garry Stone",                 requests: 965,  completions: 16752,  capped: false },
+    { user: "Sean Kelly",                  requests: 806,  completions: 18452,  capped: false },
+    { user: "Dan McMahon",                 requests: 606,  completions: 16164,  capped: false },
+    { user: "Romesh Abeyawardena",         requests: 585,  completions: 13514,  capped: false },
+    { user: "Lekshmi Nair",                requests: 479,  completions: 10463,  capped: false }
+  ],
+  model_mix: "Heavy Claude (Opus 4.6/4.7, Sonnet 4.6, Haiku 4.5) + GPT (5.3-Codex, 5.4, 5.5, 4.1) mix. Plus specialist Code Review + Coding Agent models. Vendor choice driven per task by the dev."
+};
+
+function renderGithubCopilot(){
+  const panel = document.getElementById("githubCopilotPanel");
+  if (!panel) return;
+  const d = GITHUB_COPILOT_DATA;
+  const may = d.months.find(m => m.month.startsWith("May"));
+  const apr = d.months.find(m => m.month.startsWith("Apr"));
+  const fmt = n => n == null ? "&mdash;" : n.toLocaleString();
+  const maxReq = Math.max.apply(null, d.top_users_may.map(u => u.requests));
+  const rows = d.top_users_may.map((u, i) => `
+    <tr>
+      <td><span class="pu-rank ${i===0?'gold':i===1?'silver':i===2?'bronze':''}">${i+1}</span></td>
+      <td><span class="pu-name">${u.user}</span></td>
+      <td class="num pu-msgs">${u.requests.toLocaleString()}${u.capped ? ' <span class="gh-cap">CAP</span>' : ''}</td>
+      <td class="num">${u.completions == null ? '<span style="color:#94a3b8">&mdash;</span>' : u.completions.toLocaleString()}</td>
+      <td class="pu-bar-cell"><div class="pu-bar-track"><div class="pu-bar-fill" style="width:${(u.requests/maxReq*100).toFixed(0)}%"></div></div></td>
+    </tr>
+  `).join("");
+  const growth = ((may.premium_requests / apr.premium_requests - 1) * 100).toFixed(0);
+  panel.innerHTML = `
+    <div class="pu-head">
+      <h3 class="pu-title">GitHub Copilot &mdash; engineering velocity</h3>
+      <div class="pu-period">${d.source}</div>
+    </div>
+    <p class="pu-sub">All engineers in the Technologies business are now enabled on GitHub Copilot under the AI Tooling Mandate (William, May 2026). Several also use OpenAI Codex and Anthropic Claude Code. The premium-request budget (1,000/user/month) covers heavier model calls; inline completions are unmetered.</p>
+    <div class="pu-stats">
+      <div class="pu-stat"><div class="pu-stat-val">${may.users}</div><div class="pu-stat-lbl">Active developers (May)</div></div>
+      <div class="pu-stat"><div class="pu-stat-val">${fmt(may.premium_requests)}</div><div class="pu-stat-lbl">Premium requests (May)</div><div class="pu-stat-trend" style="color:#10b981">&uarr; ${growth}% vs Apr</div></div>
+      <div class="pu-stat"><div class="pu-stat-val">${(may.aic_completions/1000).toFixed(0)}k</div><div class="pu-stat-lbl">AI completions (May, inline)</div></div>
+      <div class="pu-stat"><div class="pu-stat-val">${may.cap_hits}</div><div class="pu-stat-lbl">Users hit 1,000/mo cap (May)</div></div>
+    </div>
+    <table class="pu-table">
+      <thead>
+        <tr><th>#</th><th>Developer</th><th class="num">Premium requests (May)</th><th class="num">AI completions</th><th class="pu-bar-cell"></th></tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="gh-note"><strong>Model mix:</strong> ${d.model_mix}</div>
+    <div class="gh-note" style="background:#ecfdf5;border-color:#a7f3d0;color:#065f46;margin-top:8px"><strong>Net cost to Bellrock:</strong> &pound;0 to date &mdash; all premium requests within the included monthly allowance. The 5 May cap-hits are the early warning that we may need to bump quota or move some heavy users onto a higher tier.</div>
+  `;
+}
+
+renderGithubCopilot();
 renderCopilotAgents();
 renderCopilotUsage();
 renderPowerUsers();
@@ -1710,8 +1778,8 @@ renderPowerUsers();
 // === ROI TRACKING ===
 const ROI_DATA = [
   { project: "Bellrock AI Newsletter", area: "Cross-Business",                       owner: "Mercy",          ft: "Cost Avoidance",   sub: "Hiring avoidance",        fte: "1 person-day / fortnight", projected: 8400, actual: 700, status: "live", note: "Per Arunn (2 June): if Bellrock had an internal comms exec / content person doing this it would be ~1 person-day\'s work per fortnight, costing ~£600–800/month (£7.2–9.6k/yr). Midpoint ~£8.4k/yr used here. AI Team produces it instead — hiring avoidance. **£700 realised after 1 month live** (1 month × midpoint £700/mo of Arunn's £600–800 range). Actual will tick up monthly." },
-  { project: "Worksheet Processor (Jordon)", area: "CE",                 owner: "Mercy",          ft: "Cost Saving",      sub: "Headcount saving",        fte: "25–40 hrs/wk recovered", projected: null, actual: 0, status: "build", note: "Per Mercy\'s user deck (May 2026): ~85 subcontractor worksheets/day processed automatically; seconds per worksheet to produce a Jordon-format Word doc. Replaces 25–40 hrs/week of manual re-keying across the Jordon service team. Phase 1 (typed) live in BellrockAI; Phase 2 (handwritten accuracy) in progress; signature capture live. £/yr TBC pending service-team loaded day rate." },
-  { project: "CSEC Call Analysis Dashboard", area: "CSEC",                 owner: "Mercy",          ft: "Cost Avoidance",   sub: "Process automation",      projected: null,   actual: 0,    status: "build", note: "Replaces direct Genesis processing cost; lifts QA from sample to 100%. Genesis-side cost baseline TBC." },
+  { project: "Worksheet Processor (Jordon)", area: "CE", owner: "Mercy", ft: "Cost Saving", sub: "Headcount saving", fte: "~1,400 hrs/yr · 80% reduction", projected: 19500, actual: 0, status: "build", note: "Per updated Project Overview (June 2026): manual cost ~£24k/yr (~85 worksheets/day · 25-40 hrs/wk · £14/hr fully-loaded). Automated cost ~£4.5k/yr (45 sec confirm + pence of AI per worksheet). **Net saving ~£19.5k/yr · ~80% cost reduction · ~1,400 hrs/yr returned to the service team**. Scales linearly: ~£45k saving at 200 worksheets/day growth scenario. Phase 1 live in BellrockAI; Phase 2 (handwriting accuracy) in progress." },
+  { project: "CSEC Call Analysis Dashboard", area: "CSEC", owner: "Mercy", ft: "Cost Avoidance", sub: "Process automation", fte: "100% call coverage (vs sample)", projected: 73500, actual: 0, status: "build", note: "Per ROI Model (June 2026 spreadsheet): avoids paying TTEC/Genesys for an equivalent build. **Year 1 saving £123.5k** (incl. £50k one-time TTEC professional-services setup avoided), **Year 2+ recurring £73.5k/yr** (avoiding £76.4k of Genesys tokens — AI Scoring, Summaries, S&TA — vs Bellrock\'s ~£2.9k/yr Azure cost). **3-yr cumulative £270.5k · ~97% cost avoidance**. Solution fully operational. Covers 10 of 15 TTEC-proposed features (77%); gaps: PII masking, dispute workflow, Agent Copilot." },
   { project: "Building Condition Survey Writer (SurveAI)", area: "Consulting",   owner: "Rohan",          ft: "Cost Saving",      sub: "Process automation",      fte: "~7.5 hrs / report saved (50% reduction)", projected: null, actual: 0, status: "build", note: "Per SBE Delivery Document (Building Survey Assistant, V1.0): current average ~2 days (15 hrs) per report → target ~1 day (~7.5 hrs), a 50% reduction in drafting + QC effort. Sponsor: Dan Weiss · Requester: David Cronje. Azure hosting only, no additional licensing cost. £/yr saving TBC pending reports-per-year volume × surveyor day rate." },
   { project: "Survey Data Capture", area: "IAC",                          owner: "Mir",            ft: "Cost Saving",      sub: "Process automation",      projected: null,   actual: 0,    status: "build", note: "Underpins the 1,700-survey IAC commitment by July 2027. Per-survey time + cost saving to be sized once refined requirements land." },
   { project: "Certificate Check", area: "CSEC", owner: "Mir", ft: "Cost Saving", sub: "Headcount saving", projected: 235000, actual: 16700, blocked: true, status: "build", note: "Full-programme potential ~£235k/yr (Rich, 2 June) once Cert Check scales across the ~105,944 cert annual workload at ~98% recovery (CSEC team baseline £252k, 7 reviewers @ £36k). Phase 1 saving sized £16,765/yr (Coffee Machine PPM + PAT scope) per case study — ready to release the moment Dan unblocks the API auth key + test environment. Shown in red until the unblock lands; not included in the realised totaliser until then." },
