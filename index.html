@@ -957,24 +957,24 @@ const PROGRESS_DATA = [
     phase: "active",
     businessArea: "IAC",
     summary: "Helmet / phone camera + AI vision auto-identifies assets in a room against an NRM3 / Uniclass taxonomy. Builds on Rohan's element ID prototype.",
-    workstream: "App rebuilt against the refined requirements ahead of the Friday 12 June surveyor demo. Two key splits implemented: (1) condition vs statutory now extracted separately (was hallucinating cross-categories when run in one pass); (2) site / block / external data split by colour code (green / blue / orange) so the spreadsheet population lines up cleanly. Surveyor (Arunn) walked through it ahead of the team demo. Oliver's steer: 'don't make it obvious we're cutting their time' &mdash; aim is one home write-up day instead of two (3 days on site + 1 at home, vs 3 + 2 today).",
-    nextMilestone: "Friday 12 June demo with surveyors; pilot pathway with Surveying SLT; scope Phase 2 (image capture using Rohan's element-ID work).",
-    blockers: "None &mdash; build moving on refined requirements. Phase 2 image work pending after Friday demo.",
+    workstream: "Ben provided Neil's handwritten notes initially; Mir then asked Neil for **audio recordings of two narration modes &mdash; structured vs unstructured** so we can stress-test how the LLM handles real surveyor cadence. Audio received 22 June, run through the app, outputs shared with Ben. Ben + Neil now verifying both the output quality AND the time delta vs manual write-up. Verification call moved to **Monday 30 June** (Mir on AL Friday; depends on Ben's site availability). Rich sharing the SurveAI testing-plan template for Mir to adapt as a phased rollout doc.",
+    nextMilestone: "Mon 30 Jun verification call with Ben + Neil; adapt SurveAI testing plan template; agree phased rollout pathway with Surveying SLT.",
+    blockers: "Awaiting Ben / Neil verification of structured + unstructured audio runs.",
     impact: "Target 20% reduction in surveyor home write-up time (2 days &rarr; 1). Replaces bulk of manual surveying time at scale (1,700-survey IAC commitment by July 2027). Phase 2: image capture sits on top."
   },
   {
     title: "Certificate Check",
     owner: "Peter + Mir",
     ownerColor: "#0e6b6b",
-    status: "BUILD",
-    statusColor: "#3b82f6",
+    status: "BLOCK",
+    statusColor: "#dc2626",
     headerColor: "#0e6b6b",
     phase: "active",
     businessArea: "CSEC",
     summary: "AI compliance check across certification documents. Validates against ruleset, flags missing/expired/non-compliant items and proposes pass/fail with rationale.",
-    workstream: "Concerto API now wired in (extensive and awkward, but working). Pulling certificates via API, processing them through the AI, and sending a result message back to Concerto. Peter inserted the supplied test certs directly into the SQL database to get the test corpus loaded. Mir holds ~2 years of supplier certs that can be batched in. Plan: run 250 certs end-to-end (unique ID + AI score + notes) and route to SMEs to validate against the current rulebook &mdash; deliberately blind to our score &mdash; so we can publish a defensible accuracy figure.",
-    nextMilestone: "Concerto dev to add pass/fail endpoint (Dann owns); upload Mir's 2-year cert batch; SME validation run on 250; baseline accuracy figure produced.",
-    blockers: "Concerto pass/fail endpoint still to be built dev-side. Historic ground truth uses the old rulebook so can't be reused without SME re-mark.",
+    workstream: "Mir built a simple dashboard that pulls PPM types + metadata live via the Concerto endpoints &mdash; that side of the integration works. **Blocker**: attachments aren't returning from the PPM endpoint, which is the bit we need for AI processing. Mir trying to manually upload certs via the upload-actions API but that endpoint is blocking. Dann hasn't uploaded the certificate corpus into the database yet. Rich + Mir chasing in the dedicated cert-check support chat; Rich in Leicester tomorrow to grab Dann in person.",
+    nextMilestone: "Dann unblock: load the supplier-cert corpus into the database or open the upload-actions API path so Mir can batch them. Then 250-cert SME validation run + Concerto pass/fail endpoint.",
+    blockers: "Dann: cert corpus not uploaded to DB; upload-actions API blocked; pass/fail endpoint still to be built dev-side.",
     impact: "Cuts inconsistent pass/fail decisions across the compliance estate; reduces missed breaches and rework. Publishable accuracy metric vs human baseline."
   },
   {
@@ -987,9 +987,9 @@ const PROGRESS_DATA = [
     phase: "active",
     businessArea: "Consulting",
     summary: "Multi-stage AI pipeline for building condition survey reports. GPT drafts narratives and ratings using template structure and surveyor input. Surveyors now do 90% of the report through SurveAI; only cost / budget left manual.",
-    workstream: "Final surveyor demo done Tuesday with Lee Mountford (lead BS) + Dan Green (Central region head) &mdash; both signed off as happy. Scope landed: 4-5 photo survey returns a first draft in ~6 minutes; under an hour even for larger surveys. Postgres migration complete, IP unblock done, Azure account being provisioned through the portal. Active decision in flight on image storage (Postgres direct vs Azure Blob) &mdash; trade-off is speed vs cost on 10-20MB high-res photos. Taz (Business Transformation, Consulting) wants SurveAI extended into the London team's mould surveys; Friday meeting to scope (mould is more intrusive &mdash; moisture testing, not just visual).",
-    nextMilestone: "Push to production by end of next week. Friday meeting with Taz to scope London / mould-survey expansion. Decision on Postgres vs Azure Blob for image storage.",
-    blockers: "None blocking go-live. Storage architecture choice open. Azure provisioning ticket in flight.",
+    workstream: "Presented to Consulting Senior Leadership 22 June &mdash; well received. **David Cronje signed off the testing plan**. Rohan in Summer Simon office 24 June for final review of last week's feedback improvements; once those land it moves into the phased testing + rollout flow defined in the plan. Production push immediately after sign-off. Taz follow-up still alive for London / mould-survey expansion.",
+    nextMilestone: "24 June office review + sign-off; testing phase per the David-approved plan; production push; London / mould-survey scoping with Taz.",
+    blockers: "None &mdash; sign-off + testing in flight.",
     impact: "First-draft turnaround drops from 2 days active (1 week elapsed once it's queued past senior co-sign) to under 1 hour. Consistent narrative and ratings across reports. Expansion path into mould / dilapidations / party wall surveys."
   },
   {
@@ -1002,10 +1002,10 @@ const PROGRESS_DATA = [
     phase: "active",
     businessArea: "Cross-Business",
     summary: "Automated detection and redaction of PII across uploaded documents. Built on Bellrock AI web app front-end. DSAR-driven &mdash; sensitive content can be 10GB+ per request.",
-    workstream: "All file types now handled except .PST (Outlook archives). C# build tools request raised today for the specific PST redaction tooling &mdash; Rich keeping his approvals queue open to sign it off as it hits him. PSTs are the awkward case: extracting, redacting and re-packaging without corrupting the archive needs a dedicated C# tool. Thankfully it's free. Lots of eyes on this one: significant direct cost saving &mdash; Darren is pulling the exact figure from last year's third-party spend; Rich's working range is £100k-£200k/yr.",
-    nextMilestone: "C# build tool approval through; complete .PST handling with attachment redaction; complete synthetic test dataset; benchmark throughput; Darren to land exact prior-year spend so the cost-saving figure is defensible.",
-    blockers: "Awaiting sign-off on the C# build tool request. No access to real DSAR data for throughput testing &mdash; building synthetic instead. Audio scope deferred.",
-    impact: "Direct cost saving of £100k-£200k/yr (sizing in progress with Darren). Reduces compliance risk around PII handling; faster, more consistent redaction across the business."
+    workstream: "Major build week 16-22 June &mdash; full compliance + architecture overhaul: (1) **Audit trail system** &mdash; every change (redaction, removal, action) stored per-DSAR in Postgres, downloadable as a compliance export. (2) **Accessibility format** &mdash; PSTs split into universal .eml so recipients without Outlook can still open them, closing a real compliance gap in the third-party tool we're replacing. (3) **Architecture consolidation** &mdash; two parallel systems merged. (4) **Cache fix** &mdash; Spacy / GLiner caches now talk properly to the GPT-4o fallback cache; **API calls down ~50%**. (5) **PyTorch optimisation** so local NER models run inside Django without overloading the instance. (6) **Accuracy work** &mdash; Excel / CSV chunking widened, PowerPoint redaction now functional and faster. (7) **Test suite** &mdash; 103 passing tests. (8) **Review UI** &mdash; half-word highlight bug fixed, colour-coded data-type system, confirm-all, per-file confidence score + flag count, downloadable audit exports. Darren demo 24 June 2pm.",
+    nextMilestone: "Darren demo 24 June 2pm; real Purview test export; throughput benchmark vs the 1-month-per-DSAR budget; close out PyTorch resource ask with William.",
+    blockers: "Real DSAR data only accessible to elevated users &mdash; building Purview-format synthetic data in the meantime.",
+    impact: "Direct cost saving £100k-£200k/yr (sizing in progress with Darren). Compliance posture materially stronger than the incumbent tool. ~50% LLM-call reduction protects unit economics at scale."
   },
   {
     title: "Timesheet Intelligence Project",
@@ -1026,15 +1026,15 @@ const PROGRESS_DATA = [
     title: "Worksheet Processor (Jordon)",
     owner: "Mercy",
     ownerColor: "#7fb39a",
-    status: "BUILD",
-    statusColor: "#3b82f6",
+    status: "BLOCK",
+    statusColor: "#dc2626",
     headerColor: "#7fb39a",
     phase: "active",
     businessArea: "CE",
     summary: "Azure Document Intelligence pipeline classifying and extracting data from subcontractor worksheets into Jordon format.",
-    workstream: "Resolved this week's blocker &mdash; now running on the shared portal API key. Call held with William yesterday evening. All build work is done; only outstanding item is William's approval to release for team testing. Mercy chasing today; team should have it tomorrow.",
-    nextMilestone: "William sign-off today; team starts testing tomorrow; capture user feedback loop into Round 2.",
-    blockers: "William's approval to release for team testing (in flight).",
+    workstream: "All build changes pushed to GitHub. Blocked on William's code review &mdash; peer review with Rohan already done before first push; Rohan flagged a second peer review wouldn't work cleanly. Rich asking Amber tomorrow whether one of her teams can run an independent code review in parallel to keep momentum.",
+    nextMilestone: "William code review through (Mercy chasing this week); fallback: Amber's team peer review; then team testing.",
+    blockers: "William code review (primary). Asking Amber for an alternative reviewer.",
     impact: "Reduce manual transposition from 25&ndash;40 hrs/week to 2 hrs/week across the Jordon service team."
   },
   {
@@ -1046,10 +1046,10 @@ const PROGRESS_DATA = [
     headerColor: "#7fb39a",
     phase: "active",
     businessArea: "CSEC",
-    summary: "AI sentiment + adherence checking across CSEC calls. Outbound and inbound have separate evaluation methods; both now feed off the existing evaluator scoring forms.",
-    workstream: "Outbound: now evaluated via the same form + metrics the manual evaluators use, baked into the app. Inbound: William raised hallucination concerns (fake evaluation points being generated). Mercy reworking inbound prompt structure with Claude as senior dev. Rich proposing the 29-questions-asked-individually pattern from the prior AI award win &mdash; each question its own prompt so the LLM doesn't carry context from one answer into the next, which has previously delivered more consistent scoring. Walk-through booked with Rich on the way back from Leicester Friday.",
-    nextMilestone: "Friday walk-through with Rich on the individual-question pattern; inbound evaluation re-run; sign-off with William; demo to Adam + James + CSEC team.",
-    blockers: "Inbound prompt accuracy / hallucination risk (in flight). William sign-off after inbound is solid.",
+    summary: "AI sentiment + adherence checking across CSEC calls. Inbound transcripts pulled from Genesis directly (preferred); Whisper used for desktop-uploaded calls. Per-evaluator forms baked into the app.",
+    workstream: "Active accuracy testing on a rolling 100-call set. Initial finding: high standard deviation came from short transcripts &mdash; voicemails / abandoned calls / dropped lines giving the LLM too little context. Filter introduced: skip transcripts under ~200 characters. Rich's overlay: use Genesis call-length metadata (e.g. <1 minute) as the filter signal rather than character count &mdash; long voicemail messages would otherwise still slip through. Both filters being tested today. Target accuracy 80% (stretch to 90/99+).",
+    nextMilestone: "Today: lock filters + re-run 100-call set; send results to Rich; build presentation (what / how / accuracy) for team. Re-open for team testing once standard deviation lands inside tolerance.",
+    blockers: "Test cycle is slow because each call is re-analysed multiple times for deviation measurement. No external blocker.",
     impact: "Lifts QA coverage from sample to 100% across CSEC; surfaces low-scoring interactions for coaching; Cost Avoidance vs Genesis-side processing."
   },
   {
@@ -1062,8 +1062,8 @@ const PROGRESS_DATA = [
     phase: "active",
     businessArea: "Cross-Business",
     summary: "Internal AI Empowered SharePoint hub with sub-pages (Team page, AI Champions, Newsletter archive) and the recurring newsletter that summarises AI progress, wins and how-to tips.",
-    workstream: "Hub LIVE. AI Champions page LIVE. Team page LIVE (new team member added). Newsletter archive page being built so all back-issues sit in one place. Issue #3 going out Monday/Tuesday next week &mdash; feature slot is Rich on the AI Strategy (being signed off today at the steering meeting). Discussed adding short blog posts per project (Timesheet Intelligence, Certificate Charlotte, etc.) using existing write-ups run through Claude rather than starting from scratch.",
-    nextMilestone: "Issue #3 publish Mon/Tues; AI Strategy feature with Rich; project mini-blog posts using existing write-ups; newsletter archive page live.",
+    workstream: "Hub LIVE. AI Champions page LIVE. Team + Newsletter Archive pages LIVE. **Issue #3 published Friday 13 June; Issue #4 published 22 June** &mdash; Carlo flagged the latest as good for the wider business to see. Mini-blog posts per project queued for future editions (Timesheet Intelligence, Certificate Charlotte, etc.) using existing write-ups run through Claude.",
+    nextMilestone: "Drumbeat Issue #5; project mini-blog series; pull engagement metrics for the ROI tab.",
     blockers: "None.",
     impact: "Drives AI literacy and visibility across the business; feeds the AI Ideas chatbot."
   },
@@ -1083,7 +1083,7 @@ const PROGRESS_DATA = [
     impact: "Deflects routine queries; first revenue-generating chatbot product in market."
   },
   {
-    title: "Custom GPT Hosting on Bellrock AI Portal (working title 'Atlas')",
+    title: "Nexus — Custom GPT Hosting on Bellrock AI Portal",
     owner: "Rohan",
     ownerColor: "#1a3a3a",
     status: "BUILD",
@@ -1091,11 +1091,11 @@ const PROGRESS_DATA = [
     headerColor: "#1a3a3a",
     phase: "active",
     businessArea: "Technologies",
-    summary: "Custom GPTs running on the Django Bellrock AI Portal using the same prompts + knowledge bases as ChatGPT custom GPTs &mdash; starting with the SI Bid Writer. Working title 'Atlas' (likely to rename &mdash; clashes with Citation's Atlas product, Rich's prior employer).",
+    summary: "Custom GPTs running on the Django Bellrock AI Portal using the same prompts + knowledge bases as ChatGPT custom GPTs &mdash; starting with the SI Bid Writer. Branded **Nexus** (working title was Atlas; reused name retired with the original Procurement Nexus build).",
     workstream: "Dummy app stood up to host the custom-GPT functionality inside the portal. Layered in Microsoft's MarkItDown GitHub repo for document ingestion (PDF / Excel / PowerPoint / YouTube &rarr; Markdown), which Claude / ChatGPT consume more efficiently. Reported ~70% token reduction once large files are converted before they hit the LLM &mdash; material for portal run-cost control under the Anthropic / OpenAI usage caps.",
-    nextMilestone: "Demo the Bid Writer running on the portal; cost-compare against an equivalent ChatGPT Enterprise seat; finalise the name; first business unit migration candidate.",
+    nextMilestone: "Demo the Bid Writer running on Nexus; cost-compare against an equivalent ChatGPT Enterprise seat; first business unit migration candidate.",
     blockers: "None &mdash; demo build in flight.",
-    impact: "Frees ChatGPT Enterprise licences for redeployment; everyone in Consulting gets access via the portal; portal LLM token costs come down materially via MarkItDown pre-processing."
+    impact: "Frees ChatGPT Enterprise licences for redeployment; everyone in Consulting gets access via Nexus on the portal; portal LLM token costs come down materially via MarkItDown pre-processing."
   },
   {
     title: "Teams Transcripts (Andrew / Josh)",
@@ -1121,10 +1121,10 @@ const PROGRESS_DATA = [
     headerColor: "#7fb39a",
     phase: "discovery",
     businessArea: "Cross-Business",
-    summary: "Investigating whether AI Avatars (HeyGen / Synthesia) can be used to deliver Concerto training to internal staff and clients.",
-    workstream: "Mercy met Tom from Synthesia. Tom now wants a follow-up to introduce Synthesia to the wider CSEC training team directly &mdash; AI team to oversee / troubleshoot but not own the build. Mercy chasing Sam + Joy to set up the introduction call.",
-    nextMilestone: "Set up Tom &harr; Sam + Joy intro; secure the free 2-week trial window; first sample CSEC supplier-training avatar module.",
-    blockers: "Diary alignment between Tom (Synthesia), Sam and Joy.",
+    summary: "Investigating whether AI Avatars (HeyGen / Synthesia) can be used to deliver supplier onboarding training and other CSEC training modules to internal staff and clients.",
+    workstream: "Finance / commercial meeting with Tom (Synthesia) this week. Trial-phase access is the planned next step. Pre-trial dependency: Rich asked Mercy to sit down with William + Sam Tomlinson to confirm we're not overlapping with the existing Concerto-training product Technologies sells &mdash; that's a paid product and we should not duplicate it.",
+    nextMilestone: "Synthesia finance meeting; William + Sam scope-overlap check; trial window secured; first supplier-onboarding avatar module.",
+    blockers: "Concerto-training scope overlap check with Technologies (William + Sam Tomlinson) before committing.",
     impact: "Faster training rollout; consistent message at scale; ROI evidence-ready &mdash; Rich has Sam scoping the costings."
   },
   {
@@ -1248,16 +1248,46 @@ const PROGRESS_DATA = [
     impact: "Reduces iPath manual worksheet costing time. Recovers capacity within the shared £12k/month iPath spend. Tighter supplier cost validation and cleaner client recharge audit trail."
   },
   {
+    title: "HR/IT Leaver Asset Recovery",
+    owner: "Rohan + Martin",
+    ownerColor: "#1a3a3a",
+    status: "BUILD",
+    statusColor: "#3b82f6",
+    headerColor: "#1a3a3a",
+    phase: "active",
+    businessArea: "Cross-Business",
+    summary: "Bridge HR ↔ IT so leaver-asset chase fires preemptively (before the last paycheck), with AI-drafted comms (WhatsApp / email). Recovers laptops + other assets that currently fall through the cracks.",
+    workstream: "Discovered by Rohan working with Martin (HR / IT). **Sized debt: £88k of unreturned laptops on the books today** because HR notification reaches IT after the leaver has gone. Slight HR-side process change required to fire the trigger earlier. Same wiring as Mercy's proactive supplier-chase work (WhatsApp Business + Gen AI for drafted messages). Meeting with HR admin scheduled this week.",
+    nextMilestone: "HR admin meeting; agree the HR-side trigger; first batch of leaver chases with AI-drafted comms; track recovered £.",
+    blockers: "HR-side process change to fire the trigger early enough. WhatsApp Business comms channel sign-off (carries over from Sam/Adam's CSEC work).",
+    impact: "**£88k recoverable** in the immediate window; recurring saving as the auto-chase loop catches every leaver thereafter."
+  },
+  {
+    title: "Sustainability Goals Advisory",
+    owner: "Rohan + CC (IAC)",
+    ownerColor: "#d97706",
+    status: "SCOPE",
+    statusColor: "#c47e00",
+    headerColor: "#d97706",
+    phase: "active",
+    businessArea: "IAC / Consulting",
+    summary: "Compare client account data with publicly available client sustainability goals so FMs can offer proactive sustainability advisory as a service.",
+    workstream: "Raised by CC (IAC) via the AI Ideas chatbot as 'document analysis'. Deep-dive call 19 June with CC reframed it: the real value isn't doc analysis, it's joining our account data to clients' published sustainability targets so we can advise on the gap. Reinforced by Matthew's leadership-conference doc, key finding #5 (energy performance is a leadership-level priority led by FMs). Discovery call recordings now being fed back into the dashboard pattern per Rich's standing ask.",
+    nextMilestone: "Pilot client picked; data-source list + publicly-available goal scraping pattern agreed; first sample advisory output.",
+    blockers: "Pilot client selection; whether this is FM-served or productised advisory.",
+    impact: "Revenue Generating service line — productised sustainability advisory for IAC clients. Underpins Carlo's 'client obsessed' company goal."
+  },
+  {
     title: "Visio Flow Chart AI Agent",
-    owner: "Rohan",
+    owner: "Rohan + Robert Bowell (Group Functions / Delivery)",
     ownerColor: "#1a3a3a",
     status: "SCOPE",
     statusColor: "#c47e00",
     headerColor: "#1a3a3a",
     phase: "discovery",
-    businessArea: "Cross-Business",
-    summary: "Chatbot sat over Robert Bowell's Visio flow-chart estate (~40 charts for project Sunrise) &mdash; converted into Markdown so an LLM can read, query and bulk-edit them in natural language.",
-    workstream: "Rohan picking this up as a low-hanging-fruit pick from the IAC / Internal Productivity backlog. Approach: pass each Visio file through a Markdown converter (e.g. MarkItDown), then layer a chatbot on top for Rob's PMs / BAs to query and edit. Quick build, simple, easy to land.",
+    businessArea: "Group Functions",
+    summary: "Chatbot sat over Robert Bowell's Visio flow-chart estate (~40 charts for project Sunrise) &mdash; converted into Markdown so an LLM can read, query and bulk-edit them in natural language. Sits within Group Functions / Delivery team (not Consulting).",
+    workstream: "Rohan picking this up as a low-hanging-fruit pick from the Group Functions / Delivery team backlog. Approach: pass each Visio file through a Markdown converter (e.g. MarkItDown), then layer a chatbot on top for Rob's PMs / BAs to query and edit. Quick build, simple, easy to land.",
     nextMilestone: "Stand up a working prototype against 1-2 of Rob's Visio files; demo to Rob + PMs; agree bulk-edit pattern.",
     blockers: "None &mdash; first pass uses the same MarkItDown pipeline now being added to the portal Atlas work.",
     impact: "Cuts the PM / BA cycle time to produce a set of process flows the business can sign off; faster Sunrise / Deltek configuration."
@@ -1331,28 +1361,30 @@ function renderProgress(){
 // === Proposed Next Big Projects (5 contenders) ===
 const PROPOSED_DATA = [
   {
-    title: "QS Benchmarking Assistant",
+    title: "AI-Powered Project Cost Intelligence Platform",
     eyebrow: "Contender 1",
     headerColor: "#0d5c5c",
-    vfm: "24",
-    vfmNote: "VfM rises sharply with cleansed cost data",
+    vfm: "68",
+    vfmNote: "VfM compounds as more historic project data is added; foundation for carbon, FM cost and lifecycle planning",
     financialType: "Revenue Generating",
     businessArea: "Consulting",
-    sponsor: "Ben Smith (QS) + David Cronje  |  SLT sponsor: Dan",
-    delivery: "Strategic strategic engagement &mdash; benchmarking layer over 100+ years of Bellrock cost data. Four capabilities: cost data repo, benchmarking engine, AI-assisted cost-plan generation, abnormal identification. Phase 2: drawing analysis. Extended vision: total cost of occupation (capital + FM + carbon).",
-    value: "Faster benchmark response on bids; improved win rate; differentiated 'total cost of occupation' proposition vs CBRE Cost Lab / T&amp;T; foundation for a productised client offering with potential subscription revenue.",
+    sponsor: "David Cronje (Consulting SLT &amp; AI Champion) + Ben Smith",
+    delivery: "Consolidates historic project cost data, benchmarking and market intelligence from across the acquired consultancies into a single intelligent knowledge base. Users input project briefs, descriptions and drawings; the platform finds relevant historic comparators, analyses outcomes and generates feasibility studies, benchmarking and early-stage cost estimates including current and forecast construction inflation. SMEs review, challenge and refine every output, which follows a standardised Bellrock methodology so assumptions, exclusions, qualifications and abnormal allowances stay consistent across the business. Phase 2 adds drawing analysis. Extended vision: total cost of occupation across capital, hard FM, soft FM and carbon &mdash; a market-unique proposition vs CBRE Cost Lab and T&amp;T.",
+    value: "Makes proper use of the knowledge, experience and project data accumulated across the Group. Delivers faster, more consistent and more evidence-based feasibility studies and cost advice, with a knowledge base that improves as more projects are delivered. Supports the strategic objective of integrated end-to-end services and turns historic project information into a differentiating business asset.",
     figures: [
-      "100+ years of Bellrock cost data fragmented across acquired businesses",
-      "~80% of cost plans come from benchmark data; ~20% project-specific abnormals",
+      "Feasibility studies and benchmarking cut from days to hours",
+      "100+ years of cost data fragmented across acquired consultancies",
+      "~80% of cost plans from benchmark data; ~20% project-specific abnormals",
       "Build cost: TBD",
       "ROI £: TBD"
     ],
     openQuestions: [
+      "Historic project data access and SME time to develop and test",
       "Cost data cleansing scope and lead-time",
-      "Pricing model for productised client offering",
+      "Pricing model for the productised client offering",
       "Phase 2 drawing-analysis kick-off date"
     ],
-    ask: "Approve the strategic partner engagement for a parallel benchmarking strategic engagement alongside Asset Capture."
+    ask: "Approve Phase 1 development focused on feasibility studies, benchmarking and early-stage cost estimates, with access to historic project data and SME support to build and test. Submitted by David Cronje and Ben Smith."
   },
   {
     title: "Asset Capture",
@@ -1807,14 +1839,14 @@ const ROI_DATA = [
   { project: "Building Condition Survey Writer (SurveAI)", area: "Consulting",   owner: "Rohan",          ft: "Cost Saving",      sub: "Process automation",      fte: "First draft < 1 hr (vs 2 days active / 1 wk elapsed)", projected: null, actual: 0, status: "build", note: "Per final surveyor demo 9 June (Lee Mountford, lead BS + Dan Green, Central region head): first draft from SurveAI in **~6 minutes for 4-5 photos**, **under 1 hour for full surveys**. Manual baseline confirmed by Lee: ~2 days of active drafting time, but ~1 week elapsed once it's queued through reviewer + senior co-sign. Surveyors now do 90% of the report through SurveAI; only cost / budget left manual. Sponsor: Dan Weiss · Requester: David Cronje. Azure hosting only, no additional licensing cost. £/yr saving TBC pending reports-per-year volume × surveyor day rate." },
   { project: "Asset Survey Data Capture", area: "IAC",                          owner: "Mir",            ft: "Cost Saving",      sub: "Process automation",      fte: "Target 20% home write-up time (2 days → 1)", projected: null,   actual: 0,    status: "build", note: "Per Oliver Bratton (Consulting BT) on 9 June: target is to cut surveyors' home write-up days from 2 → 1 (3 days site + 1 day home, vs 3 + 2 today) — a **20% time reduction**. Underpins the 1,700-survey IAC commitment by July 2027. Per-survey £ saving to be sized once refined requirements land + 12 June demo signed off. Phase 2 to layer image capture (Rohan's element-ID work) on top." },
   { project: "Certificate Check", area: "CSEC", owner: "Mir", ft: "Cost Saving", sub: "Headcount saving", projected: 235000, actual: 16700, blocked: true, status: "build", note: "Full-programme potential ~£235k/yr (Rich, 2 June) once Cert Check scales across the ~105,944 cert annual workload at ~98% recovery (CSEC team baseline £252k, 7 reviewers @ £36k). Phase 1 saving sized £16,765/yr (Coffee Machine PPM + PAT scope) per case study — ready to release the moment Dan unblocks the API auth key + test environment. Shown in red until the unblock lands; not included in the realised totaliser until then." },
-  { project: "Redaction (PII) Project", area: "Cross-Business",                      owner: "Peter",          ft: "Cost Avoidance",   sub: "Risk avoidance",          projected: 100000, actual: 0,    status: "build", note: "Projected \u00a3100k/yr (Rich, 2 June) \u2014 held as the conservative end of the range. Working figure quoted in the 11 June team catchup: prior-year third-party spend somewhere between \u00a3100k and \u00a3200k; Darren pulling the exact prior-year figure so we can swap the conservative \u00a3100k for the validated number when it lands. Lots of eyes on this internally because direct cost saving means it sits straight into the realised totaliser once live. \u00a3100k retained until Darren's figure validates an uplift." },
+  { project: "Redaction (PII) Project", area: "Cross-Business",                      owner: "Peter",          ft: "Cost Saving",   sub: "Supplier cost reduction",          projected: 100000, actual: 0,    status: "build", note: "[Reclassified Cost Avoidance \u2192 Cost Saving 23 Jun 2026 per Carlo's steering steer: displaces existing third-party redaction spend, not a hypothetical future cost.] Projected \u00a3100k/yr (Rich, 2 June) \u2014 held as the conservative end of the range. Working figure quoted in 11 June catchup: prior-year third-party spend somewhere between \u00a3100k and \u00a3200k; Darren pulling exact prior-year figure. Lots of eyes internally because direct cost saving now sits straight into the realised totaliser once live." },
   { project: "Timesheet Intelligence", area: "CE",                       owner: "Peter",          ft: "Cost Saving",      sub: "Process automation",      projected: null,   actual: 0,    status: "build", note: "Per case study: 1–2 hrs/week senior reviewer time recovered (4–8 hrs/month). Only direct cost is £60/month EPIX API charge — covered by saving in month one. Case study deliberately does not headline a £ saving as the primary value is audit / risk control. Headline £ TBC." },
   { project: "AI Avatar Training (Synthesia)", area: "Cross-Business",               owner: "Mercy",          ft: "Cost Saving",      sub: "Headcount saving",        projected: null,   actual: 0,    status: "tbc",   note: "Sam working on costings. Replaces manual supplier / induction training delivery time." },
   { project: "SI Bid Writer V30", area: "Consulting", owner: "Jacob Carter", ft: "Revenue Generating", sub: "Win-rate improvement", fte: "ESPO: 43.33/65 → 65/65", projected: null, actual: null, status: "live", note: "AI-authored and evaluated bids. £ figure TBC — Jacob (SI bid lead) needs to check bid records + speak to SNL leadership / Regional MD before exact value figures can be given. Sub-task time savings (Jacob, 3 June): **~90%+ on first drafting / case study repurposing**, **~90% on locating high-scoring historic content**, **~80% on finding suitable case studies**. Productivity multiplier **2-4× on smaller/repeatable bids**. Without the tool he could only do ~70-75% of current output. Quality proof — **ESPO bid score 43.33/65 (2021, pre-AI) → 65/65 (2026, with Custom GPT)**. Other key wins (partly attributed): Fusion21, University of Sheffield (×2 frameworks), University of Leeds Equality of Access Programme of Works. Caveats from Jacob: too early for clean trend (team only on it properly since Jan); no like-for-like cohort possible. Per William\\u2019s investor briefing: 94% time reduction (5 vs 90 mins) for tender assessment reports; recently 69/70 priv · 10/10 gov scoring. BellrockAI portal usage (last 12mo): 1.49K chats / 9 users. Now converting GPT → Agent for further quality." },
-  { project: "Bellrock AI Gateway + AI Portal", area: "Technologies",              owner: "William Wildridge", ft: "Cost Avoidance",   sub: "Supplier cost reduction", fte: "15 tools live", projected: 300000, actual: 0, status: "live", note: "Per William\'s May 2026 investor briefing: £300k/yr annualised cost avoidance — replaces ad-hoc long-tail ChatGPT licence sprawl across the business with governed access through the AI Portal (15 tools live, role-based access, usage tracking, single sign-on). Also the launchpad: AI Lease Review graduated from internal use to commercial product with Islington Borough Council." },
-  { project: "Custom GPT Hosting on Bellrock AI Portal", area: "Technologies",     owner: "Rohan",          ft: "Cost Saving",      sub: "Supplier cost reduction", projected: null,   actual: 0,    status: "build", note: "Demo in flight: replaces some Consulting ChatGPT Enterprise seats by hosting GPTs on the portal. \u00a3 saving = seat licence cost \u00d7 displaced count \u2014 TBC." },
+  { project: "Bellrock AI Gateway + AI Portal", area: "Technologies",              owner: "William Wildridge", ft: "Cost Saving",   sub: "Supplier cost reduction", fte: "15 tools live", projected: 300000, actual: 0, status: "live", note: "[Reclassified Cost Avoidance → Cost Saving 23 Jun 2026 per Carlo's steering steer: displaces existing company-paid ChatGPT licence spend, not a hypothetical future cost. Confirm with William the split of company-paid seats vs avoided future sprawl.] Per William's May 2026 investor briefing: £300k/yr annualised — replaces ad-hoc long-tail ChatGPT licence sprawl across the business with governed access through the AI Portal (15 tools live, role-based access, usage tracking, single sign-on). Also the launchpad: AI Lease Review graduated from internal use to commercial product with Islington Borough Council." },
+  { project: "Nexus \u2014 Custom GPT Hosting on Bellrock AI Portal", area: "Technologies",     owner: "Rohan",          ft: "Cost Saving",      sub: "Supplier cost reduction", projected: null,   actual: 0,    status: "build", note: "Branded **Nexus** (working title was Atlas). Demo in flight: replaces some Consulting ChatGPT Enterprise seats by hosting GPTs on the portal. \u00a3 saving = seat licence cost \u00d7 displaced count \u2014 TBC." },
   { project: "Asset Capture", area: "Consulting",         owner: "JJ + David Cronje", ft: "Revenue Generating", sub: "New AI service",       projected: null,   actual: 0,    status: "tbc",   note: "Multimodal asset audit platform. Serves the 1,700-survey IAC commitment. Revenue scope TBC." },
-  { project: "QS Cost Mgmt & Benchmarking (Strategic Engagement #2)", area: "Consulting", owner: "Ben Smith + Dan", ft: "Revenue Generating", sub: "New AI service", projected: null, actual: 0, status: "tbc", note: "100yr of cost data structured into a new fee-earning service line. Revenue scope TBC." },
+  { project: "AI Project Cost Intelligence Platform (Strategic Engagement #2)", area: "Consulting", owner: "David Cronje + Ben Smith", ft: "Revenue Generating", sub: "New AI service", projected: null, actual: 0, status: "tbc", note: "Formalised Jun 2026 by David Cronje (Consulting SLT & AI Champion) and Ben Smith as the AI-Powered Project Cost Intelligence Platform. Phase 1 ask to Carlo: approve development for feasibility studies, benchmarking and early-stage cost estimates, plus historic project data access and SME support. Consolidates 100+ years of acquired cost data into one knowledge base; targets feasibility studies from days to hours. Revenue scope TBC pending Phase 1; extended vision is total cost of occupation across capital, FM and carbon." },
   { project: "Lens Invoice Validation (LEAPFROG)", area: "Finance",           owner: "Dershana + Monika", ft: "Cost Saving", sub: "Headcount saving",          fte: "2 FTE (iPath)", projected: 36000, actual: 0, status: "tbc", note: "Displaces 2 of the current 8 iPath validator heads (Rich, 2 June). Team cost ~£144k/yr (£12k/mo per LENS scope doc) gives ~£18k/yr per head, so 2-head saving ≈ £36k/yr. Phase 2 (Costing) will displace additional heads — TBC how many. Phase 1 KPI: 98% extraction accuracy, 95% decision accuracy." },
   { project: "Lens Costing Validation (Worksheets)", area: "Finance",         owner: "Dershana + Monika", ft: "Cost Saving", sub: "Headcount saving",          projected: null, actual: 0, status: "tbc", note: "Phase 2 of the LENS programme — displaces further iPath heads from the same 8-strong team (~£18k/yr per head). FTE displacement TBC: worksheets are harder than invoices (mix of typed and handwritten from sole-trader suppliers). Will add to the Lens Invoice £36k saving once sized." },
   { project: "Proactive Supplier Chase System", area: "CSEC",              owner: "Adam Porter / CSEC", ft: "Cost Avoidance", sub: "Risk avoidance",        projected: null,   actual: 0,    status: "tbc",   note: "Strategic engagement candidate. Awaiting 2-week iPath snapshot to size definitively." },
@@ -1824,8 +1856,10 @@ const ROI_DATA = [
   { project: "Weather-Driven Predictive Maintenance", area: "Cross-Business",          owner: "Rich Merrett (origin)",      ft: "Cost Avoidance",   sub: "Risk avoidance",          projected: null, actual: 0, status: "tbc", note: "Combine public weather APIs (current/forecast/historical) with Bellrock's Concerto maintenance history to predict weather-driven failures (e.g. supermarket fridges in summer heat) and shift maintenance from rota- to condition-based. Origin: Polly vendor conversation 2 June 2026 — Rich's view: \"hundreds of years of weather data + 20yrs of Bellrock maintenance reports = correlation play\". £/yr TBC pending correlation discovery (which weather signals best predict which asset failure types)." },
   { project: "Executive Voice Programme (Carlo + 4 MDs)",     area: "Marketing", owner: "Arunn Ramadoss",       ft: "Cost Saving",      sub: "Supplier cost reduction", projected: 120000, actual: 24000, status: "live",  note: "£24k/yr REALISED today (per Arunn, 2 June): Carlo\'s social media programme was costing £2k/month in agency fees and we have now stopped paying — that saving is on the P&L. **Projected £120k/yr full cost avoidance** as Arunn scales the AI-driven programme to the 4 MDs (5 × £24k = £120k). Actual will tick up as each MD comes online. 4 Claude licences ~£100/month running cost." },
   { project: "Client Account Email Archive (BCC Vault)",      area: "Cross-Business", owner: "Lucy Iles (IAC)",   ft: "Cost Avoidance",   sub: "Rework reduction",        projected: null, actual: 0, status: "tbc", note: "New idea submitted via AI Ideas chatbot (Lucy Iles, IAC, June 2026). Shared inbox / BCC vault per client account so colleagues can see the email history when the account-owner is unavailable. £ TBC — needs baseline on repeat-chase frequency + cross-questioning escalations." },
-  { project: "Visio Flow Chart AI Agent", area: "Cross-Business", owner: "Rohan + Robert Bowell", ft: "Cost Saving", sub: "Process automation", projected: null, actual: 0, status: "build", note: "Rohan picked from the IAC / Internal Productivity backlog (Rob Bowell origin, AI Ideas chatbot). Chatbot sat over ~40 Visio flow charts for project Sunrise; MarkItDown converts Visio → MD so the LLM can read, query and bulk-edit. £ TBC — value is PM/BA cycle time + Deltek configuration sign-off speed." },
-  { project: "Supplier Insurance Auto-Reminder + Annual Re-verification", area: "IAC", owner: "Rohan + Adam Porter", ft: "Cost Avoidance", sub: "Compliance penalty avoidance", projected: null, actual: 0, status: "build", note: "Combined pair from the IAC backlog (Adam Porter scoped first idea; new Concerto endpoints unlock build). Date-driven auto-reminders for expiring supplier insurance + annual re-verification of supplier-submitted data, with a supplier-side self-service update path. £ TBC — covers 1,400 suppliers; baseline is current manual periodic re-check load." }
+  { project: "Visio Flow Chart AI Agent", area: "Group Functions", owner: "Rohan + Robert Bowell (Delivery)", ft: "Cost Saving", sub: "Process automation", projected: null, actual: 0, status: "build", note: "Sits within Group Functions / Delivery team, not Consulting. Rohan picked from the AI Ideas backlog (Rob Bowell origin). Chatbot sat over ~40 Visio flow charts for project Sunrise; MarkItDown converts Visio → MD so the LLM can read, query and bulk-edit. £ TBC — value is PM/BA cycle time + Deltek configuration sign-off speed." },
+  { project: "Supplier Insurance Auto-Reminder + Annual Re-verification", area: "IAC", owner: "Rohan + Adam Porter", ft: "Cost Avoidance", sub: "Compliance penalty avoidance", projected: null, actual: 0, status: "build", note: "Combined pair from the IAC backlog (Adam Porter scoped first idea; new Concerto endpoints unlock build). Date-driven auto-reminders for expiring supplier insurance + annual re-verification of supplier-submitted data, with a supplier-side self-service update path. £ TBC — covers 1,400 suppliers; baseline is current manual periodic re-check load." },
+  { project: "HR/IT Leaver Asset Recovery", area: "Cross-Business", owner: "Rohan + Martin", ft: "Cost Saving", sub: "Process automation", fte: "£88k unreturned-laptop debt today", projected: null, actual: 0, status: "build", note: "Identified 22 June by Rohan working with Martin (HR/IT). **£88k of debt sitting on the books today** because leavers' laptops aren't being returned — HR notification reaches IT after the leaver has gone, so we miss the window to chase before the last paycheck. Build: preemptive HR↔IT bridge that fires the moment a leaver decision is taken, with AI-drafted chase comms (WhatsApp/email) reusing the same wiring Mercy's proactive supplier chase will use. Rohan to confirm with Carlo whether the £88k can be attributed to AI saving headline (Rich's view: yes, where AI is in the comms loop). Slight HR-side process change required; meeting with HR admin this week." },
+  { project: "Sustainability Goals Advisory", area: "IAC / Consulting", owner: "Rohan + CC (IAC)", ft: "Revenue Generating", sub: "New AI service", projected: null, actual: 0, status: "build", note: "Raised by CC (IAC) via AI Ideas chatbot as 'document analysis'; deep-dive 19 June revealed the real prize is comparing client account data with publicly available client sustainability goals + targets so FMs can give proactive advisory to clients. Reinforced by Matthew's leadership-conference doc Key Finding #5 (energy performance is a leadership-level priority led by FMs). Aligns with Carlo's 'client obsessed' company goal. Revenue scope TBC — productised advisory service for IAC clients." }
 ];
 
 const FT_DEFS = [
@@ -1854,9 +1888,9 @@ const NF_MAP = {
   "AI Avatar Training (Synthesia)":                          { type: "Throughput", sub: "Capacity released",      baseline: "Instructor-led, bottlenecked",          measure: "Courses produced / refresh time",     target: "AI-produced training modules at scale",      realised: "Synthesia scoping; Tom-to-team intro pending" },
   "SI Bid Writer V30":                                       { type: "Quality",    sub: "Accuracy",               baseline: "Manual (EasyPQQ + Deltek search; ~5,400 logged answers, only ~200 marked 4-5/5)", measure: "Eval score + draft time + framework fee won", target: "Match/beat 69/70 priv \u00b7 10/10 gov \u00b7 90%+ time saved on first drafting", realised: "Live \u00b7 **ESPO 43.33\u219265/65** \u00b7 wins: ESPO, Fusion21, Sheffield \u00d72, Leeds EoA \u00b7 1.49K chats / 9 users \u00b7 £ TBC pending SNL validation" },
   "Bellrock AI Gateway + AI Portal":                         { type: "Throughput", sub: "Capacity released",      baseline: "Ad-hoc tool sprawl",                    measure: "Governed tools live",                 target: "Central catalogue replacing shadow AI",      realised: "15 tools live" },
-  "Custom GPT Hosting on Bellrock AI Portal":                { type: "Throughput", sub: "Capacity released",      baseline: "Separate Enterprise seats",             measure: "GPTs hosted / seats displaced",       target: "All Consulting GPTs on portal",              realised: "Atlas working title — dummy app live; MarkItDown layered in (~70% token reduction); name likely to change" },
+  "Nexus — Custom GPT Hosting on Bellrock AI Portal":        { type: "Throughput", sub: "Capacity released",      baseline: "Separate Enterprise seats",             measure: "GPTs hosted / seats displaced",       target: "All Consulting GPTs on Nexus",               realised: "Branded Nexus (was Atlas); dummy app live; MarkItDown layered in (~70% token reduction)" },
   "Asset Capture":                                           { type: "Throughput", sub: "Time per task",          baseline: "Manual 6-facet survey",                 measure: "Time/survey + quality",               target: "Strategic-partner 8-wk build",               realised: "Scoping" },
-  "QS Cost Mgmt & Benchmarking (Strategic Engagement #2)":   { type: "Quality",    sub: "Accuracy",               baseline: "BCIS / personal experience",            measure: "Benchmark response time + accuracy",   target: "Productised benchmarking service",           realised: "Scoping" },
+  "AI Project Cost Intelligence Platform (Strategic Engagement #2)":   { type: "Quality",    sub: "Accuracy",               baseline: "BCIS / personal experience",            measure: "Benchmark response time + accuracy",   target: "Productised benchmarking service",           realised: "Scoping" },
   "Lens Invoice Validation (LEAPFROG)":                      { type: "Quality",    sub: "Accuracy",               baseline: "100% manual (iPath)",                   measure: "Extraction + decision accuracy",      target: "98% extract / 95% decision",                 realised: "Scoping / design" },
   "Lens Costing Validation (Worksheets)":                    { type: "Quality",    sub: "Accuracy",               baseline: "100% manual (iPath)",                   measure: "Accuracy: typed vs handwritten",      target: "95\u201396% across both modes",             realised: "Phase 2 \u2014 awaits Phase 1" },
   "Proactive Supplier Chase System":                         { type: "Experience", sub: "Service / SLA",          baseline: "Manual 48-hr phone chasing",            measure: "SLA hit rate + chases/job",           target: "Auto-tiered escalation",                     realised: "Awaiting 2-wk iPath snapshot" },
@@ -1866,8 +1900,10 @@ const NF_MAP = {
   "Weather-Driven Predictive Maintenance":                   { type: "Quality",    sub: "Accuracy",               baseline: "Rota-based maintenance",                measure: "Reactive callouts avoided",           target: "Reactive callouts reduced via weather signal", realised: "Correlation discovery \u2014 ideation" },
   "Executive Voice Programme (Carlo + 4 MDs)":               { type: "Experience", sub: "Engagement",             baseline: "Agency-produced voice (Carlo)",         measure: "LinkedIn engagement growth",          target: "AI-driven voice across Carlo + 4 MDs",      realised: "Carlo live (Wk1); 4 MDs scaling" },
   "Client Account Email Archive (BCC Vault)":                { type: "Experience", sub: "Engagement",             baseline: "Emails siloed in sender's mailbox",     measure: "Repeat-chase rate + handover time",   target: "Shared client-account email visibility",     realised: "Ideation \u2014 submitted via AI Ideas chatbot" },
-  "Visio Flow Chart AI Agent":                               { type: "Throughput", sub: "Time per task",          baseline: "Manual Visio edit cycle per chart",     measure: "Edit cycle time / chart",             target: "Bulk natural-language edit across charts",   realised: "Picked up by Rohan; MarkItDown pipeline shared with Atlas" },
-  "Supplier Insurance Auto-Reminder + Annual Re-verification": { type: "Quality",  sub: "Compliance",             baseline: "Manual periodic re-checks",             measure: "Suppliers verified / lapsed certs",   target: "Auto-reminder + supplier self-service",      realised: "Rohan scoping with Adam + James" }
+  "Visio Flow Chart AI Agent":                               { type: "Throughput", sub: "Time per task",          baseline: "Manual Visio edit cycle per chart",     measure: "Edit cycle time / chart",             target: "Bulk natural-language edit across charts",   realised: "Picked up by Rohan; MarkItDown pipeline shared with Nexus" },
+  "Supplier Insurance Auto-Reminder + Annual Re-verification": { type: "Quality",  sub: "Compliance",             baseline: "Manual periodic re-checks",             measure: "Suppliers verified / lapsed certs",   target: "Auto-reminder + supplier self-service",      realised: "Rohan scoping with Adam + James" },
+  "HR/IT Leaver Asset Recovery":                             { type: "Throughput", sub: "Capacity released",      baseline: "£88k unreturned-laptop debt",          measure: "Assets recovered / £ recovered",      target: "Proactive HR↔IT chase before last paycheck",  realised: "Rohan + Martin scoping; HR admin meeting this week" },
+  "Sustainability Goals Advisory":                           { type: "Quality",    sub: "Accuracy",               baseline: "No advisory layer today",              measure: "Client goal-alignment outputs",       target: "Productised sustainability advisory",         realised: "Deep-dive done 19 June; revenue scope TBC" }
 };
 
 function fmtGBP(n){
