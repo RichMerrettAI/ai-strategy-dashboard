@@ -216,6 +216,20 @@ body {
 .roi-cat .roi-subs { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.65); font-weight: 700; }
 .roi-cat .roi-subs span { color: var(--lichen); margin-right: 10px; }
 
+/* Area filter pills */
+.roi-area-bar { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 14px 18px; margin-bottom: 14px; }
+.roi-area-bar-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; flex-wrap: wrap; gap: 10px; }
+.roi-area-bar-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; color: #64748b; font-weight: 800; }
+.roi-area-bar-summary { font-size: 11px; color: var(--pine); font-weight: 700; }
+.roi-area-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+.roi-area-pill { font-family: inherit; font-size: 11px; font-weight: 700; padding: 7px 12px; border-radius: 999px; border: 1px solid #e2e8f0; background: #f8fafc; color: #475569; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+.roi-area-pill:hover { background: #eef2f7; color: #1f2937; }
+.roi-area-pill.active { background: var(--pine); color: #fff; border-color: var(--pine); box-shadow: 0 1px 3px rgba(13,92,92,0.25); }
+.roi-area-pill.combo { border-style: dashed; border-color: #7fb39a; color: #0d5c5c; }
+.roi-area-pill.combo.active { background: #0d5c5c; color: #fff; border-style: solid; }
+.roi-area-pill .pill-count { display: inline-block; margin-left: 6px; font-size: 10px; opacity: 0.75; font-weight: 700; }
+.roi-area-pill.active .pill-count { opacity: 1; color: var(--lichen); }
+
 .roi-totals-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
 .roi-total-tile { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 22px 26px; }
 .roi-total-tile.projected { border-top: 4px solid var(--pine); }
@@ -948,6 +962,21 @@ renderCalc();
 // === Current Progress (project-by-project, ownership tag) ===
 const PROGRESS_DATA = [
   {
+    title: "Fabric Data Modelling AI Agent",
+    owner: "Owner TBC (likely Mir) &middot; Sponsor: Amber Dagia &middot; Demand: Andre Bothma (L&amp;G)",
+    ownerColor: "#0d5c5c",
+    status: "SCOPE",
+    statusColor: "#c47e00",
+    headerColor: "#0d5c5c",
+    phase: "active",
+    businessArea: "Group Functions",
+    summary: "AI agent that ingests Bronze / Silver source data in Microsoft Fabric and recommends the Gold star schema &mdash; which fields become dimensions vs facts, the queries to populate each, plus the boilerplate around slowly changing dimensions, surrogate keys and row hashes. **This is the AI delivery vehicle for Andre Bothma's existing 'Data Ingestion' workstream** (bulk process of data sources into Fabric to automate creation of the L&amp;G dashboard) which is currently shaping and unfunded.",
+    workstream: "Sponsor: Amber Dagia (Data &amp; Insights). 19 June scoping session walked through the current medallion architecture &mdash; Bronze (raw parquet from Concerto Tom + Lens + BIP + Genesis) &rarr; Silver (light cleanup) &rarr; Gold (star schema warehouse). The Microsoft partner built the existing pipeline last year using T-SQL stored procedures. Every new data source today needs the watermark / key column / lakehouse-name analysis done manually (days of work per source) before the SCD + surrogate-key plumbing can be written. Rich suggested n8n (NA10) as a possible prototype platform; fast prototype could provision a temporary Gold warehouse in the dev environment. Multi-agent pattern discussed: specialists per layer + a mastermind / QA agent on top. **The Andre Bothma 'Data Ingestion' demand provides the commercial wrapper**: Andre is raising a business case to cover delivery cost, which can fund this AI build. Amber to send the existing stored-procedure exports + run order so we can validate the thinking against the live setup.",
+    nextMilestone: "Owner assigned (Mir tentative); align with Andre on the L&amp;G business case so it covers the AI delivery; Amber to share stored-procedure exports + run order; n8n fast-prototype build in dev environment against a temporary Gold warehouse; first dim/fact recommendation output on a sample source.",
+    blockers: "No dedicated owner yet (likely Mir once Cert Check + Asset Survey land). Andre's Data Ingestion business case is unfunded &mdash; need that signed off to underwrite delivery. Amber's existing data engineer has not delivered against a 3-week deliverable &mdash; capacity constraint on her side.",
+    impact: "Cuts the multi-day data-source onboarding cycle that Amber's team carries every time a new source lands. Directly delivers Andre's L&amp;G dashboard automation. Unlocks downstream reporting and supports the wider data plays (Churn, Cross-Sell, PdM) which all depend on Amber's Gold warehouse being current and usable. Andre's business case framing: Efficiency + potential new revenue."
+  },
+  {
     title: "Asset Survey Data Capture",
     owner: "Mir",
     ownerColor: "#0d5c5c",
@@ -1293,19 +1322,49 @@ const PROGRESS_DATA = [
     impact: "Cuts the PM / BA cycle time to produce a set of process flows the business can sign off; faster Sunrise / Deltek configuration."
   },
   {
-    title: "Weather-Driven Predictive Maintenance",
-    owner: "Rich + IAC (origin)",
+    title: "AI-Powered Predictive &amp; Proactive Maintenance",
+    owner: "Rich + Adam Porter / Mark Brown (sponsor TBC)",
     ownerColor: "#d97706",
     status: "RESEARCH",
     statusColor: "#0ea5e9",
     headerColor: "#d97706",
     phase: "discovery",
+    businessArea: "IAC + CSEC + CE",
+    summary: "Combine public weather APIs (current / forecast / historical), event signals (e.g. World Cup driving fridge open/close volume) and on-sensor data with Concerto's 20+ years of maintenance history to predict asset failures before they happen. Shifts maintenance from rota- to condition-based.",
+    workstream: "Origin: Polly vendor conversation 2 June. Reinforced by London Tech Week 9 June with a Centre Facilities Management vendor running fine-tuned LLMs on the sensors themselves (10-year coin-cell battery; sensors ping only when an issue is detected with severity baked into the ping). **James Minifie was the original IAC scoping lead but has now left Bellrock** &mdash; per the 24 June AI Delivery Workshop. Replacement MD-level sponsor needed (Adam Porter / Mark Brown / Dan Weiss candidates). Promoted to a Proposed Project (Contender 5). Super El Ni&ntilde;o storm window over the next 12 months is the timing hook.",
+    nextMilestone: "Replacement MD sponsor confirmed; pilot asset class chosen (supermarket fridges or critical lifts); third-party weather/IoT API scope + cost agreed; correlation discovery against Concerto failure data.",
+    blockers: "Replacement sponsor (James Minifie departure); pilot asset class selection; third-party API spend envelope.",
+    impact: "Reactive call-outs reduced; SLA breach fines avoided; supermarket fridges + critical lifts fixed before they fail. Both Cost Saving (reactive callouts) and Cost Avoidance (SLA fines), leading on CS per Carlo's steer."
+  },
+  {
+    title: "Cross-Sell Intelligence",
+    owner: "Rich + Amber (data) + sponsor TBC",
+    ownerColor: "#b8852a",
+    status: "RESEARCH",
+    statusColor: "#0ea5e9",
+    headerColor: "#b8852a",
+    phase: "discovery",
     businessArea: "Cross-Business",
-    summary: "Combine public weather APIs (current / forecast / historical) and event data (e.g. World Cup driving fridge open/close volume) with Concerto maintenance history to predict weather-driven asset failures and shift maintenance from rota- to condition-based.",
-    workstream: "Origin: Polly vendor conversation 2 June. Reinforced by London Tech Week conversation 9 June with a Centre Facilities Management vendor running fine-tuned LLMs on the sensors themselves (10-year coin-cell battery; sensor pings only when an issue is detected, with severity built into the ping). Rohan emailing James Minifie / Adam Porter / Langram to scope IAC requirements. Possible Super El Ni&ntilde;o weather window over the next 12 months is the timing hook.",
-    nextMilestone: "Scope reply from James Minifie; confirm weather + event signal scope; pick a pilot asset class (supermarket fridges or critical lifts); correlation discovery against existing Concerto failure data.",
-    blockers: "Scope reply from IAC; pilot asset class selection.",
-    impact: "Shifts maintenance from rota- to condition-based; reactive callout volume reduction; potential AI Awards-grade case study."
+    summary: "AI joins client data across Consulting, IAC, CSEC, Technologies and CE. Surfaces patterns: clients with us in one service line but not adjacent ones; profiles that mirror successful cross-sell journeys; trigger events that precede a win. Outputs land as briefings on Account Managers' desks.",
+    workstream: "Rich called it out 11 June grad catchup: cross-sell is non-existent in this business outside Technologies. Lifted into a Proposed Project (Contender 6) after the 24 June AI Delivery Workshop where Rich named it as one of his three RG bets &mdash; \"we've got data and that could be something generating; we've not got anything in AI that's generating yet\". Builds on Amber's data cleanup work.",
+    nextMilestone: "Confirm exec sponsor + lead BU; 6-week discovery sprint to size the prize; data hand-off agreed with Amber's team.",
+    blockers: "Exec sponsor; which BU runs the pilot validation; privacy / consent envelope for joining client data across BUs.",
+    impact: "Each successful cross-sell is incremental revenue from accounts we already serve. Closes a known commercial gap. Counts as Revenue Generating in Carlo's £10m EBITDA framing."
+  },
+  {
+    title: "AI Churn Modelling",
+    owner: "Rich + Amber (data) + CSEC + sponsor TBC",
+    ownerColor: "#0e6b6b",
+    status: "RESEARCH",
+    statusColor: "#0ea5e9",
+    headerColor: "#0e6b6b",
+    phase: "discovery",
+    businessArea: "Cross-Business",
+    summary: "Models churn risk per client from contracts, support calls, complaints, SLA performance, billing and Mercy's CSEC Call Analysis sentiment scoring. Flags at-risk accounts with the early indicators that drove the score, so Account Managers can intervene before notice is served.",
+    workstream: "Origin: 11 June grad catchup, Rich + Amber. Lifted into a Proposed Project (Contender 7) after the 24 June AI Delivery Workshop. First concrete example of pulling AI threads together into a wider commercial system &mdash; CSEC operational signals feeding commercial action. Arunn's challenge (11 June): check whether HubSpot's baked-in AI capabilities cover part of this before building.",
+    nextMilestone: "Define churn for Bellrock (full account loss vs service-line loss); join the data; back-test signal quality across the last 12 months.",
+    blockers: "Definition of churn; data ownership across BUs; intervention playbook; HubSpot capability audit.",
+    impact: "Each retained client is incremental retained revenue. Counts as Revenue Generating (retained). Tighter loop between CSEC operational signals and commercial action."
   },
   {
     title: "Supplier Insurance Auto-Reminder + Annual Re-verification",
@@ -1460,6 +1519,82 @@ const PROPOSED_DATA = [
       "Phase 2 (reactives) sequencing and AI scope &mdash; logic-only sufficient for Phase 1?"
     ],
     ask: "Endorse the Sync pilot business case once Steve issues it; agree the in-kind 'trader' resource (2 days/week); approve developer carve-out for the build."
+  },
+  {
+    title: "AI-Powered Predictive &amp; Proactive Maintenance",
+    eyebrow: "Contender 5 &mdash; Operational Transformation",
+    headerColor: "#1a3a3a",
+    vfm: "85",
+    vfmNote: "Major Bet &mdash; spans IAC + CSEC + CE; both Cost Saving (reactive call-outs avoided) and Cost Avoidance (SLA fines avoided) — per Carlo, lead the case on the CS side",
+    financialType: "Cost Saving",
+    businessArea: "IAC + CSEC + CE",
+    sponsor: "Sponsor TBC &mdash; James Minifie (former IAC lead on this) has left; need a new MD-level sponsor. Adam Porter / Mark Brown / Dan Weiss are the candidates",
+    delivery: "Combines public weather APIs (current / forecast / historical) and event signals (e.g. World Cup driving fridge open/close volume) with Concerto's 20+ years of maintenance history to predict asset failures before they happen. Third-party APIs feed the external signals; Bellrock's own data feeds the failure-pattern correlation. Stretch: fine-tuned LLMs running on the sensors themselves (10-year coin-cell battery, ping only when an issue is detected, severity baked into the ping) &mdash; pattern Rich saw at London Tech Week with a Centre Facilities Management vendor 9 June. Shift maintenance from rota-based to condition-based.",
+    value: "Reactive call-outs reduced; SLA breach fines avoided; supermarket fridges, critical lifts and rooftop plant get fixed before they fail. Predictive cycle protects margin on PPM contracts and lifts NPS. Super El Ni&ntilde;o storm window over the next 12 months is the timing hook &mdash; deliver in time to prove value during a high-volatility weather year.",
+    figures: [
+      "Polly vendor conversation 2 June 2026 was the origin (weather APIs)",
+      "London Tech Week 9 June &mdash; on-sensor fine-tuned LLM pattern observed",
+      "20+ years of Bellrock maintenance reports available in Concerto",
+      "Cost Saving + Cost Avoidance (SLA fines) split &mdash; lead on CS per Carlo's steering steer",
+      "ROI &pound;: TBC pending pilot asset class + baseline reactive callout volume"
+    ],
+    openQuestions: [
+      "Replacement MD sponsor now that James Minifie has left",
+      "Pilot asset class &mdash; supermarket fridges, critical lifts, rooftop plant?",
+      "External-data scope &mdash; weather only, or events + IoT sensor data too",
+      "Third-party API costs at scale (weather + IoT)"
+    ],
+    ask: "Endorse a pilot scope on one client + one asset class; confirm replacement exec sponsor at MD level; approve third-party API spend envelope (weather APIs at the minimum)."
+  },
+  {
+    title: "Cross-Sell Intelligence",
+    eyebrow: "Contender 6 &mdash; Revenue Generating",
+    headerColor: "#b8852a",
+    vfm: "75",
+    vfmNote: "Revenue Generating &mdash; Carlo's preferred lens. Closes a known gap: Bellrock barely cross-sells outside Technologies today.",
+    financialType: "Revenue Generating",
+    businessArea: "Cross-Business",
+    sponsor: "Sponsor TBC &mdash; needs an MD-level owner. JJ + Amber + Sales Directors candidates. Builds on Amber's data team work.",
+    delivery: "Pull client account data from across the Group (Consulting + IAC + CSEC + Technologies + Critical Engineering) into one view. AI surfaces patterns: clients that are with us in one service line but not in adjacent ones; clients whose maturity profile mirrors successful cross-sell journeys; trigger events that precede a cross-sell win. Outputs land as briefings on Account Managers' desks, not as a dashboard nobody opens.",
+    value: "Closes the cross-sell gap Rich called out 11 June: \"Cross-sell is non-existent in this business&mdash;Technologies cross-sells amongst Technologies but we don't look at our Consulting / IAC clients or the trends we have.\" Each successful cross-sell is incremental revenue from accounts we already serve.",
+    figures: [
+      "Bellrock client base: cross-account view does not exist today",
+      "Origin: 11 June grad catchup; Amber's data cleanup process feeds into this",
+      "Revenue-Generating only &mdash; no double-count vs Cost Saving",
+      "ROI &pound;: TBC; baseline = current cross-sell rate × average uplift"
+    ],
+    openQuestions: [
+      "Which BU's account managers lead the validation loop",
+      "Data hand-off between Amber's cleanup work and the AI layer",
+      "Privacy / consent envelope when joining client data across BUs",
+      "Targeting model &mdash; rule-based for v1, ML for v2?"
+    ],
+    ask: "Confirm exec sponsor + lead BU for the pilot; approve a 6-week discovery sprint to size the prize and build a defensible business case."
+  },
+  {
+    title: "AI Churn Modelling",
+    eyebrow: "Contender 7 &mdash; Revenue Generating (retained)",
+    headerColor: "#0e6b6b",
+    vfm: "70",
+    vfmNote: "Revenue Generating via retained revenue + CSEC operations lift. Pulls together threads already running &mdash; call-analysis sentiment, contract data, complaint patterns.",
+    financialType: "Revenue Generating",
+    businessArea: "Cross-Business",
+    sponsor: "Sponsor TBC &mdash; data sits in Amber's team + CSEC. Likely co-sponsored MD + Group Data lead.",
+    delivery: "Use Bellrock client + interaction data (contracts, support calls, complaints, SLA performance, billing) to model churn risk per client. Combines with Mercy's CSEC Call Analysis sentiment / adherence scoring &mdash; first concrete example of pulling AI threads together into a wider system, per Rich's 11 June framing. Outputs flag at-risk clients with the early indicators that drove the score, so Account Managers can intervene before notice is served.",
+    value: "Each retained client is incremental retained revenue. Tighter loop between CSEC operational signals (call sentiment, repeat-chase volume, SLA misses) and commercial action. Surfaces \"why are we losing this client\" as a continuous question, not an annual post-mortem.",
+    figures: [
+      "Origin: 11 June grad catchup conversation with Amber",
+      "Feeds: contracts, support calls, complaints, SLA data, billing, call-analysis sentiment",
+      "Pulls Mercy's CSEC Call Analysis into a wider commercial system",
+      "ROI &pound;: TBC; baseline = current annual churn rate × average client revenue"
+    ],
+    openQuestions: [
+      "Definition of churn for Bellrock (full account loss vs service-line loss)",
+      "Data ownership across BUs &mdash; who's the canonical source",
+      "Intervention playbook &mdash; what does an Account Manager actually do when a client is flagged",
+      "Build vs HubSpot AI capability we already pay for (Arunn's 11 June point)"
+    ],
+    ask: "Confirm exec sponsor + Group Data lead pairing; approve a discovery sprint to (a) define churn for Bellrock, (b) join the data, (c) prove signal quality on a 12-month back-test."
   }
 ];
 
@@ -1853,7 +1988,10 @@ const ROI_DATA = [
   { project: "AI Voice Triage Agent (CSEC Helpdesk)", area: "CSEC",        owner: "Rich + CSEC",    ft: "Cost Saving",      sub: "Headcount saving",        projected: null,   actual: 0,    status: "tbc",   note: "Vendor research underway; size depends on Genesis transition." },
   { project: "Red Asset Approval Statement Automation", area: "CSEC",      owner: "Josh + CSEC",    ft: "Cost Saving",      sub: "Process automation",      projected: null,   actual: 0,    status: "tbc",   note: "~1 agent-day per 100 jobs released; awaiting current daily-volume baseline." },
   { project: "Sync — Trading Floor & Dynamic Work Allocation", area: "Procurement", owner: "Mark Tyson / Louis Waldron", ft: "Revenue Generating", sub: "New AI service", projected: null, actual: 0, status: "tbc", note: "Strategic Procurement programme replacing what was Nexus. Two revenue/margin levers: (1) margin uplift on PPMs via discounted forward-buy of supplier spare capacity, (2) commission on client click-and-buy through Bellrock Connect / Microsoft Pages. Pilot business case in flight (Steve). ROI sized after pilot demo (Aug 2026 target)." },
-  { project: "Weather-Driven Predictive Maintenance", area: "Cross-Business",          owner: "Rich Merrett (origin)",      ft: "Cost Avoidance",   sub: "Risk avoidance",          projected: null, actual: 0, status: "tbc", note: "Combine public weather APIs (current/forecast/historical) with Bellrock's Concerto maintenance history to predict weather-driven failures (e.g. supermarket fridges in summer heat) and shift maintenance from rota- to condition-based. Origin: Polly vendor conversation 2 June 2026 — Rich's view: \"hundreds of years of weather data + 20yrs of Bellrock maintenance reports = correlation play\". £/yr TBC pending correlation discovery (which weather signals best predict which asset failure types)." },
+  { project: "AI-Powered Predictive & Proactive Maintenance", area: "IAC + CSEC + CE", owner: "Rich + sponsor TBC", ft: "Cost Saving", sub: "Process automation", projected: null, actual: 0, status: "tbc", note: "[Promoted to Proposed Project Contender 5 on 24 June 2026.] Combine public weather APIs + event signals + on-sensor LLM telemetry with Bellrock's Concerto maintenance history (20+ years) to predict asset failures before they happen and shift maintenance from rota- to condition-based. Origin: Polly vendor call 2 June; reinforced by London Tech Week 9 June (Centre Facilities Management on-sensor LLMs). James Minifie was the original IAC scoping lead but has left Bellrock — replacement MD sponsor needed (Adam Porter / Mark Brown / Dan Weiss candidates). Both Cost Saving (reactive callouts) and Cost Avoidance (SLA fines) — leading on CS per Carlo's steer. £/yr TBC pending pilot asset class + correlation discovery." },
+  { project: "Cross-Sell Intelligence", area: "Cross-Business", owner: "Rich + Amber (data) + sponsor TBC", ft: "Revenue Generating", sub: "New AI service", projected: null, actual: 0, status: "tbc", note: "[Proposed Project Contender 6, 24 June 2026.] AI joins client account data across Consulting / IAC / CSEC / Technologies / CE to surface cross-sell patterns — clients with us in one service line but not adjacent ones; profiles that mirror successful cross-sell journeys; trigger events that precede a win. Outputs land as briefings on Account Managers' desks. Origin: 11 June grad catchup, Rich's call-out that 'cross-sell is non-existent in this business outside Technologies'. Revenue Generating only — no double-count. £/yr TBC; baseline = current cross-sell rate × average uplift." },
+  { project: "AI Churn Modelling", area: "Cross-Business", owner: "Rich + Amber (data) + CSEC + sponsor TBC", ft: "Revenue Generating", sub: "Customer-facing AI product", projected: null, actual: 0, status: "tbc", note: "[Proposed Project Contender 7, 24 June 2026.] Models churn risk per client from contracts, support calls, complaints, SLA performance, billing and Mercy's CSEC Call Analysis sentiment scoring. Flags at-risk accounts so Account Managers can intervene before notice is served. Origin: 11 June grad catchup, Rich + Amber. First concrete pull-it-together example — CSEC operational signals feeding commercial action. Arunn's caveat (11 June): audit HubSpot's baked-in AI capabilities before building. £/yr TBC; baseline = current annual churn rate × average client revenue." },
+  { project: "Fabric Data Modelling AI Agent", area: "Group Functions", owner: "Owner TBC (likely Mir) + Amber Dagia (sponsor) + Andre Bothma (L&G demand)", ft: "Cost Saving", sub: "Process automation", projected: null, actual: 0, status: "build", note: "From 19 June Rich + Amber scoping session. AI agent recommends Gold-warehouse star schema (dims / facts) + builds SCD + surrogate-key + row-hash plumbing automatically. **AI delivery vehicle for Andre Bothma's existing 'Data Ingestion' workstream** — bulk-processes data sources into Fabric to automate the L&G dashboard. Andre's project is currently shaping and unfunded; he is raising a new business case to cover delivery cost, which can underwrite this AI build. Today: every new data source needs days of manual analysis before T-SQL stored procedures can be written. Rich's prototype platform candidate: n8n (NA10). Multi-agent pattern (specialists per layer + mastermind / QA). £/yr TBC; baseline = data-engineering hours per new source × frequency. Cross-cuts unlock: Churn, Cross-Sell and PdM all depend on Amber's Gold warehouse being current. Andre's value framing: Efficiency + potential new revenue." },
   { project: "Executive Voice Programme (Carlo + 4 MDs)",     area: "Marketing", owner: "Arunn Ramadoss",       ft: "Cost Saving",      sub: "Supplier cost reduction", projected: 120000, actual: 24000, status: "live",  note: "£24k/yr REALISED today (per Arunn, 2 June): Carlo\'s social media programme was costing £2k/month in agency fees and we have now stopped paying — that saving is on the P&L. **Projected £120k/yr full cost avoidance** as Arunn scales the AI-driven programme to the 4 MDs (5 × £24k = £120k). Actual will tick up as each MD comes online. 4 Claude licences ~£100/month running cost." },
   { project: "Client Account Email Archive (BCC Vault)",      area: "Cross-Business", owner: "Lucy Iles (IAC)",   ft: "Cost Avoidance",   sub: "Rework reduction",        projected: null, actual: 0, status: "tbc", note: "New idea submitted via AI Ideas chatbot (Lucy Iles, IAC, June 2026). Shared inbox / BCC vault per client account so colleagues can see the email history when the account-owner is unavailable. £ TBC — needs baseline on repeat-chase frequency + cross-questioning escalations." },
   { project: "Visio Flow Chart AI Agent", area: "Group Functions", owner: "Rohan + Robert Bowell (Delivery)", ft: "Cost Saving", sub: "Process automation", projected: null, actual: 0, status: "build", note: "Sits within Group Functions / Delivery team, not Consulting. Rohan picked from the AI Ideas backlog (Rob Bowell origin). Chatbot sat over ~40 Visio flow charts for project Sunrise; MarkItDown converts Visio → MD so the LLM can read, query and bulk-edit. £ TBC — value is PM/BA cycle time + Deltek configuration sign-off speed." },
@@ -1897,13 +2035,16 @@ const NF_MAP = {
   "AI Voice Triage Agent (CSEC Helpdesk)":                   { type: "Experience", sub: "Service / SLA",          baseline: "All calls human-handled",               measure: "Wait time + autonomous resolution %", target: "Reduce wait time + autonomous handle %",     realised: "Vendor research" },
   "Red Asset Approval Statement Automation":                 { type: "Quality",    sub: "Compliance",             baseline: "Manual lookup mid-call",                measure: "Statement compliance %",              target: "Auto-statement against client criteria",     realised: "Scoping (Josh)" },
   "Sync \u2014 Trading Floor & Dynamic Work Allocation":     { type: "Experience", sub: "Engagement",             baseline: "No forward-buy mechanism",              measure: "Utilisation rate + adoption",         target: "Pilot demo Aug 2026; client adoption",       realised: "Pilot business case in flight (Steve)" },
-  "Weather-Driven Predictive Maintenance":                   { type: "Quality",    sub: "Accuracy",               baseline: "Rota-based maintenance",                measure: "Reactive callouts avoided",           target: "Reactive callouts reduced via weather signal", realised: "Correlation discovery \u2014 ideation" },
+  "AI-Powered Predictive & Proactive Maintenance":           { type: "Quality",    sub: "Accuracy",               baseline: "Rota-based maintenance",                measure: "Reactive callouts avoided + SLA fines avoided", target: "Condition-based maintenance via weather + sensor + event signal", realised: "Promoted to Proposed Project Contender 5; James Minifie departure means new sponsor needed" },
   "Executive Voice Programme (Carlo + 4 MDs)":               { type: "Experience", sub: "Engagement",             baseline: "Agency-produced voice (Carlo)",         measure: "LinkedIn engagement growth",          target: "AI-driven voice across Carlo + 4 MDs",      realised: "Carlo live (Wk1); 4 MDs scaling" },
   "Client Account Email Archive (BCC Vault)":                { type: "Experience", sub: "Engagement",             baseline: "Emails siloed in sender's mailbox",     measure: "Repeat-chase rate + handover time",   target: "Shared client-account email visibility",     realised: "Ideation \u2014 submitted via AI Ideas chatbot" },
   "Visio Flow Chart AI Agent":                               { type: "Throughput", sub: "Time per task",          baseline: "Manual Visio edit cycle per chart",     measure: "Edit cycle time / chart",             target: "Bulk natural-language edit across charts",   realised: "Picked up by Rohan; MarkItDown pipeline shared with Nexus" },
   "Supplier Insurance Auto-Reminder + Annual Re-verification": { type: "Quality",  sub: "Compliance",             baseline: "Manual periodic re-checks",             measure: "Suppliers verified / lapsed certs",   target: "Auto-reminder + supplier self-service",      realised: "Rohan scoping with Adam + James" },
   "HR/IT Leaver Asset Recovery":                             { type: "Throughput", sub: "Capacity released",      baseline: "£88k unreturned-laptop debt",          measure: "Assets recovered / £ recovered",      target: "Proactive HR↔IT chase before last paycheck",  realised: "Rohan + Martin scoping; HR admin meeting this week" },
-  "Sustainability Goals Advisory":                           { type: "Quality",    sub: "Accuracy",               baseline: "No advisory layer today",              measure: "Client goal-alignment outputs",       target: "Productised sustainability advisory",         realised: "Deep-dive done 19 June; revenue scope TBC" }
+  "Sustainability Goals Advisory":                           { type: "Quality",    sub: "Accuracy",               baseline: "No advisory layer today",              measure: "Client goal-alignment outputs",       target: "Productised sustainability advisory",         realised: "Deep-dive done 19 June; revenue scope TBC" },
+  "Cross-Sell Intelligence":                                 { type: "Experience", sub: "Reach & adoption",       baseline: "No cross-account view today",          measure: "Cross-sell briefings to AMs / wins",  target: "Productised cross-sell recommendation engine", realised: "Proposed Project Contender 6; discovery sprint pending sponsor" },
+  "AI Churn Modelling":                                      { type: "Quality",    sub: "Accuracy",               baseline: "Annual post-mortem only",              measure: "At-risk flags 90 days ahead of churn", target: "Continuous churn-risk score per client",      realised: "Proposed Project Contender 7; data join + back-test pending" },
+  "Fabric Data Modelling AI Agent":                          { type: "Throughput", sub: "Time per task",          baseline: "Days per new source (manual T-SQL)",   measure: "Hrs per new source onboarded",         target: "Auto dim/fact recommendation + SCD plumbing", realised: "19 June Amber scoping; AI vehicle for Andre Bothma's L&G Data Ingestion (business case in flight)" }
 };
 
 function fmtGBP(n){
@@ -1920,9 +2061,63 @@ function fmtGBP(n){
   return "\u00a3" + n.toLocaleString();
 }
 
+// === Area-filter state + definitions ===
+let currentAreaFilter = "all";
+
+// Multi-area-string-aware matcher: a project's area can list several BUs (e.g. "IAC + CSEC + CE")
+// — the project shows up under every single-area filter it touches, plus any combo filter that
+// covers those BUs. Each AREA_FILTERS entry declares the set of canonical BU labels it owns;
+// `match(r)` then checks whether r.area name-overlaps with that set.
+function areaHas(rArea, target){
+  if (!rArea) return false;
+  if (rArea === target) return true;
+  // Recognise compound areas like "IAC + CSEC + CE" or "IAC / Consulting"
+  const tokens = rArea.split(/[+/]/).map(s => s.trim());
+  return tokens.includes(target);
+}
+const AREA_FILTERS = [
+  { key: "all",          label: "All areas",          match: r => true },
+  { key: "iac-csec",     label: "IAC + CSEC",         combo: true,
+    match: r => areaHas(r.area, "IAC") || areaHas(r.area, "CSEC") },
+  { key: "consulting",   label: "Consulting",         match: r => areaHas(r.area, "Consulting") },
+  { key: "iac",          label: "IAC",                match: r => areaHas(r.area, "IAC") },
+  { key: "csec",         label: "CSEC",               match: r => areaHas(r.area, "CSEC") },
+  { key: "ce",           label: "CE",                 match: r => areaHas(r.area, "CE") },
+  { key: "finance",      label: "Finance",            match: r => areaHas(r.area, "Finance") },
+  { key: "marketing",    label: "Marketing",          match: r => areaHas(r.area, "Marketing") },
+  { key: "technologies", label: "Technologies",       match: r => areaHas(r.area, "Technologies") },
+  { key: "procurement",  label: "Procurement",        match: r => areaHas(r.area, "Procurement") },
+  { key: "cross",        label: "Cross-Business",     match: r => areaHas(r.area, "Cross-Business") },
+  { key: "group",        label: "Group Functions",    match: r => areaHas(r.area, "Group Functions") }
+];
+
+function setRoiArea(key){
+  currentAreaFilter = key;
+  renderRoi();
+}
+
 function renderRoi(){
   const panel = document.getElementById("roiPanel");
   if (!panel) return;
+
+  // Apply area filter (single source of truth for everything below)
+  const filterDef = AREA_FILTERS.find(a => a.key === currentAreaFilter) || AREA_FILTERS[0];
+  const filteredData = ROI_DATA.filter(filterDef.match);
+
+  // Build pill bar
+  const areaPills = AREA_FILTERS.map(a => {
+    const count = ROI_DATA.filter(a.match).length;
+    const cls = ["roi-area-pill", a.combo ? "combo" : "", a.key === currentAreaFilter ? "active" : ""].filter(Boolean).join(" ");
+    return `<button class="${cls}" onclick="setRoiArea('${a.key}')">${a.label}<span class="pill-count">${count}</span></button>`;
+  }).join("");
+
+  // Headline summary for the active filter
+  const f_proj = filteredData.reduce((s,r) => s + (typeof r.projected === "number" ? r.projected : 0), 0);
+  const f_act  = filteredData.reduce((s,r) => s + (typeof r.actual === "number" && !r.blocked ? r.actual : 0), 0);
+  const summaryLine = currentAreaFilter === "all"
+    ? `${ROI_DATA.length} projects across the portfolio`
+    : `${filteredData.length} project${filteredData.length===1?'':'s'} in ${filterDef.label} &middot; ${fmtGBP(f_proj)} projected &middot; ${fmtGBP(f_act)} realised`;
+
   const catCards = FT_DEFS.map(f => `
     <div class="roi-cat">
       <h3>${f.key}</h3>
@@ -1933,7 +2128,7 @@ function renderRoi(){
 
   const totals = { proj: 0, act: 0, byFt: {"Cost Saving": 0, "Cost Avoidance": 0, "Revenue Generating": 0} };
   totals.actByFt = {"Cost Saving": 0, "Cost Avoidance": 0, "Revenue Generating": 0};
-  ROI_DATA.forEach(r => {
+  filteredData.forEach(r => {
     if (typeof r.projected === "number") {
       totals.proj += r.projected;
       totals.byFt[r.ft] = (totals.byFt[r.ft] || 0) + r.projected;
@@ -1974,9 +2169,9 @@ function renderRoi(){
   }).join("");
   const realised = totals.proj > 0 ? (totals.act / totals.proj * 100).toFixed(1) : "0.0";
 
-  const sized = ROI_DATA.filter(r => typeof r.projected === "number" && r.projected > 0).length;
-  const realisedCount = ROI_DATA.filter(r => typeof r.actual === "number" && r.actual > 0 && !r.blocked).length;
-  const rows = ROI_DATA.map(r => {
+  const sized = filteredData.filter(r => typeof r.projected === "number" && r.projected > 0).length;
+  const realisedCount = filteredData.filter(r => typeof r.actual === "number" && r.actual > 0 && !r.blocked).length;
+  const rows = filteredData.map(r => {
     const ftCls = FT_DEFS.find(f => f.key === r.ft)?.cls || "cs";
     const projCell = r.projected === null ? `<span class="roi-num-tbc">TBC</span>` : `<span class="roi-num-projected">${fmtGBP(r.projected)}</span>`;
     const actCell  = r.actual === null
@@ -2004,8 +2199,8 @@ function renderRoi(){
 
   // --- Operational (non-financial) value lens ---
   const nfCounts = { "Throughput": 0, "Quality": 0, "Experience": 0 };
-  ROI_DATA.forEach(r => { const nf = NF_MAP[r.project]; if (nf) nfCounts[nf.type] = (nfCounts[nf.type] || 0) + 1; });
-  const nfMapped = ROI_DATA.filter(r => NF_MAP[r.project]).length;
+  filteredData.forEach(r => { const nf = NF_MAP[r.project]; if (nf) nfCounts[nf.type] = (nfCounts[nf.type] || 0) + 1; });
+  const nfMapped = filteredData.filter(r => NF_MAP[r.project]).length;
 
   const nfBand = NF_DEFS.map(d => `
     <div class="roi-nf-tile" style="--tile-c:${d.colour}">
@@ -2016,7 +2211,7 @@ function renderRoi(){
     </div>
   `).join("");
 
-  const opsRows = ROI_DATA.map(r => {
+  const opsRows = filteredData.map(r => {
     const nf = NF_MAP[r.project];
     const statusCls = r.status === "live" ? "live" : (r.status === "build" ? "build" : "tbc");
     const statusLabel = r.status === "live" ? "LIVE" : (r.status === "build" ? "BUILD" : "TBC");
@@ -2048,16 +2243,26 @@ function renderRoi(){
 
   panel.innerHTML = `
     <div class="roi-cat-grid">${catCards}</div>
+    <div class="roi-area-bar">
+      <div class="roi-area-bar-head">
+        <div>
+          <div class="roi-area-bar-label">Filter ROI by business area</div>
+          <div class="roi-area-bar-summary">${summaryLine}</div>
+        </div>
+        <div style="font-size:10px;color:#94a3b8">Dashed pill = combined view</div>
+      </div>
+      <div class="roi-area-pills">${areaPills}</div>
+    </div>
     <div class="roi-totals-row">
       <div class="roi-total-tile projected">
-        <div class="roi-total-eyebrow">Projected ROI &middot; annual run-rate</div>
+        <div class="roi-total-eyebrow">Projected ROI &middot; annual run-rate ${currentAreaFilter !== "all" ? `&middot; ${filterDef.label}` : ""}</div>
         <div class="roi-total-val">${fmtGBP(totals.proj)}</div>
-        <div class="roi-total-sub">${sized} of ${ROI_DATA.length} projects sized so far &middot; ${ROI_DATA.length - sized} TBC pending baselines</div>
-        <div class="roi-stack-bar">${stackSegs}</div>
+        <div class="roi-total-sub">${sized} of ${filteredData.length} projects sized so far &middot; ${filteredData.length - sized} TBC pending baselines</div>
+        <div class="roi-stack-bar">${stackSegs || '<div style="background:#f1f5f9;width:100%"></div>'}</div>
         <div class="roi-stack-legend">${legend}</div>
       </div>
       <div class="roi-total-tile actual">
-        <div class="roi-total-eyebrow">Realised ROI &middot; evidenced to date</div>
+        <div class="roi-total-eyebrow">Realised ROI &middot; evidenced to date ${currentAreaFilter !== "all" ? `&middot; ${filterDef.label}` : ""}</div>
         <div class="roi-total-val">${fmtGBP(totals.act)}</div>
         <div class="roi-total-sub">${realisedCount} project${realisedCount===1?'':'s'} reporting actuals &middot; ${realised}% of projected realised so far</div>
         <div class="roi-stack-bar">${realisedStackSegs || '<div style="background:#f1f5f9;width:100%"></div>'}</div>
@@ -2065,7 +2270,7 @@ function renderRoi(){
         <div style="font-size:11px;color:#94a3b8;margin-top:8px">Sylvia (joining July) will own the evidenced-actuals capture every 3 months.</div>
       </div>
     </div>
-    <div class="roi-nf-intro"><strong>Operational value</strong> &mdash; the proof that doesn't carry a &pound; sign (yet). Each project is also measured in its own native unit against a baseline, so we can show a project is working before its &pound; figure is sized. ${nfMapped} of ${ROI_DATA.length} projects mapped.</div>
+    <div class="roi-nf-intro"><strong>Operational value</strong> &mdash; the proof that doesn't carry a &pound; sign (yet). Each project is also measured in its own native unit against a baseline, so we can show a project is working before its &pound; figure is sized. ${nfMapped} of ${filteredData.length} projects mapped${currentAreaFilter !== "all" ? ` in ${filterDef.label}` : ""}.</div>
     <div class="roi-nf-band">${nfBand}</div>
     <div class="roi-table-wrap">
       <div class="roi-table-head">
